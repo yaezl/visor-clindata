@@ -8,7 +8,8 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User
@@ -31,37 +32,40 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable
 {
-	protected $table = 'users';
+    use Notifiable;
 
-	protected $casts = [
-		'email_verified_at' => 'datetime',
-		'two_factor_confirmed_at' => 'datetime',
-		'current_team_id' => 'int'
-	];
+    protected $table = 'users';
 
-	protected $hidden = [
-		'password',
-		'two_factor_secret',
-		'remember_token'
-	];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
+        'current_team_id' => 'int',
+        'password' => 'hashed',
+    ];
 
-	protected $fillable = [
-		'name',
-		'email',
-		'email_verified_at',
-		'password',
-		'two_factor_secret',
-		'two_factor_recovery_codes',
-		'two_factor_confirmed_at',
-		'remember_token',
-		'current_team_id',
-		'profile_photo_path'
-	];
+    protected $hidden = [
+        'password',
+        'two_factor_secret',
+        'remember_token'
+    ];
 
-	public function files()
-	{
-		return $this->hasMany(File::class);
-	}
+    protected $fillable = [
+        'name',
+        'email',
+        'email_verified_at',
+        'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'remember_token',
+        'current_team_id',
+        'profile_photo_path'
+    ];
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
 }

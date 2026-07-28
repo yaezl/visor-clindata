@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
-class Hc_Aplicacion_VacunaController extends Controller
+class HcAplicacionVacunaController extends Controller
 {
     public function __construct(protected HcAplicacionVacunaService $hcAplicacionVacunaService)
     {
