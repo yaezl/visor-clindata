@@ -1,33 +1,25 @@
-<?php
+// ---------------------------------------------------------
+// routes/api.php  
+// ---------------------------------------------------------
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\consultaDetalleController;
 use App\Http\Controllers\DiagnosticoController;
 use App\Http\Controllers\EventohcController;
 use App\Http\Controllers\AntecedentepatologicoController;
-use App\Http\Controllers\HcVacunaController;
 use App\Http\Controllers\HcAplicacionVacunaController;
+use App\Http\Controllers\HcVacunaController;
 use App\Http\Controllers\InformedeestudioController;
+use App\Http\Controllers\InternacionPersonaController;
+use App\Http\Controllers\OrdendeestudioController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Datos de pacientes / historia clínica: SIEMPRE protegidos por auth.
-    Route::resource('patients', PersonaController::class)->only(['index', 'show']);
-    Route::resource('consultas', ConsultaController::class)->only(['index', 'show']);
-    Route::resource('diagnosticos', DiagnosticoController::class)->only(['index', 'show']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('patients', PersonaController::class)->only(['index', 'show']);
+    Route::apiResource('consultas', ConsultaController::class)->only(['index', 'show']);
+    Routes::apiResource('consultaDetalle', ConsultaDetalleController::class)->only(['index','show']);
+    Routes::apiResource('diagnostico', DiagnosticoController::class)->only(['index', 'show']);
     Route::resource('eventos', EventohcController::class)->only(['index', 'show']);
     Route::resource('antecedentes-patologicos', AntecedentepatologicoController::class)->only(['index', 'show']);
     Route::resource('vacunas', HcVacunaController::class)->only(['index', 'show']);
@@ -37,7 +29,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/urgentes', [InformedeestudioController::class, 'urgentes'])->name('urgentes');
     });
     Route::resource('informes-de-estudio', InformedeestudioController::class)->only(['index', 'show']);
-
+    Route::resource('internaciones', InternacionPersonaController::class)->only(['index', 'show']);
+    Route::resource('ordenes-de-estudio', OrdendeestudioController::class)->only(['index', 'show']);
 });
 
-require __DIR__.'/auth.php';
+// Ambos controllers ya devuelven JSON cuando $request->wantsJson() es true,
+// así que no hace falta duplicarlos para la API

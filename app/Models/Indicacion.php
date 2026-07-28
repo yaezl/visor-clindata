@@ -1,17 +1,14 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * Class Indicacion
- * 
+ *
  * @property int $id
  * @property int|null $created_by
  * @property int|null $updated_by
@@ -23,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $dtype
  * @property string|null $observacionGeneral
  * @property int|null $persona_internacion_id
- * 
+ *
  * @property Usuario|null $usuario
  * @property InternacionPersona|null $internacion_persona
  * @property Consultum|null $consultum
@@ -39,6 +36,18 @@ class Indicacion extends Model
 {
 	protected $table = 'indicacion';
 	public $timestamps = false;
+
+	/**
+	 * Relaciones "hijas" de la herencia por tipo (dtype),
+	 * en snake_case tal cual se llaman los métodos de relación.
+	 */
+	protected const RELACIONES_POR_TIPO = [
+		'consulta_receta_electronica',
+		'hcrecetum',
+		'orden_ad_hoc',
+		'ordendeestudio',
+		'ordendeoftalmologium',
+	];
 
 	protected $casts = [
 		'created_by' => 'int',
@@ -100,5 +109,24 @@ class Indicacion extends Model
 	public function ordendeoftalmologium()
 	{
 		return $this->hasOne(Ordendeoftalmologium::class, 'id');
+	}
+
+	/**
+	 * Nombre de la relación "hija" que corresponde según el dtype.
+	 * Usa snake_case porque acá, a diferencia de Consultadetalle,
+	 * hay relaciones de más de una palabra (orden_ad_hoc, etc.).
+	 */
+	public function getRelacionEspecificaAttribute(): ?string
+	{
+		$nombre = Str::snake(class_basename($this->dtype));
+
+		return in_array($nombre, self::RELACIONES_POR_TIPO, true) ? $nombre : null;
+	}
+
+	public function getDetalleEspecificoAttribute()
+	{
+		$relacion = $this->relacion_especifica;
+
+		return $relacion ? $this->$relacion : null;
 	}
 }

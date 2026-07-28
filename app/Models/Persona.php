@@ -475,7 +475,7 @@ class Persona extends Model
 	public function archivos()
 	{
 		return $this->belongsToMany(Archivo::class, 'persona_archivo')
-					->withPivot('id', 'creadopor_id', 'modificadopor_id', 'eliminado_por_id', 'comentario', 'activo', 'creado_en', 'modificado_en', 'borrado_en', 'tipo_archivo');
+			->withPivot('id', 'creadopor_id', 'modificadopor_id', 'eliminado_por_id', 'comentario', 'activo', 'creado_en', 'modificado_en', 'borrado_en', 'tipo_archivo');
 	}
 
 	public function persona_auditoria()
@@ -496,14 +496,14 @@ class Persona extends Model
 	public function objetivos()
 	{
 		return $this->belongsToMany(Objetivo::class, 'persona_objetivo')
-					->withPivot('id');
+			->withPivot('id');
 	}
 
 	public function plans()
 	{
 		return $this->belongsToMany(Plan::class)
-					->withPivot('id', 'tipo_beneficiario_id', 'tipo_parentesco_id', 'nro_beneficiario', 'created_by', 'modified_by', 'deleted_at', 'deleted_by', 'condicion_iva_id', 'borrado_logico', 'tipo_plan', 'modalidad_contratacion_id', 'plan_beneficios_id', 'codigoSeguridad')
-					->withTimestamps();
+			->withPivot('id', 'tipo_beneficiario_id', 'tipo_parentesco_id', 'nro_beneficiario', 'created_by', 'modified_by', 'deleted_at', 'deleted_by', 'condicion_iva_id', 'borrado_logico', 'tipo_plan', 'modalidad_contratacion_id', 'plan_beneficios_id', 'codigoSeguridad')
+			->withTimestamps();
 	}
 
 	public function persona_plan_por_defecto()
@@ -514,7 +514,7 @@ class Persona extends Model
 	public function plansocials()
 	{
 		return $this->belongsToMany(Plansocial::class)
-					->withPivot('id', 'origenplansocial_id', 'tipo_beneficiario_id', 'tipo_parentesco_id', 'creado_por_id', 'modificado_por_id', 'eliminado_por_id', 'observacion', 'creado_en', 'modificado_en', 'borrado_en', 'fecha_caducidad', 'pension', 'certificado');
+			->withPivot('id', 'origenplansocial_id', 'tipo_beneficiario_id', 'tipo_parentesco_id', 'creado_por_id', 'modificado_por_id', 'eliminado_por_id', 'observacion', 'creado_en', 'modificado_en', 'borrado_en', 'fecha_caducidad', 'pension', 'certificado');
 	}
 
 	public function persona_tipo_contribuyentes()
@@ -530,7 +530,7 @@ class Persona extends Model
 	public function usuarios()
 	{
 		return $this->belongsToMany(Usuario::class, 'persona_usuario_portal', 'persona_id', 'created_by')
-					->withPivot('id', 'modified_by', 'usuario_portal_id', 'principal', 'provisorio', 'type', 'borrado_logico', 'modified_at');
+			->withPivot('id', 'modified_by', 'usuario_portal_id', 'principal', 'provisorio', 'type', 'borrado_logico', 'modified_at');
 	}
 
 	public function usuario_portals()
@@ -576,5 +576,14 @@ class Persona extends Model
 	public function turno_programados()
 	{
 		return $this->hasMany(TurnoProgramado::class);
+	}
+
+	public function getNombreCompletoAttribute(): string
+	{
+		if ($this->usar_nombre_alias && !empty($this->nombre_alias)) {
+			return $this->nombre_alias;
+		}
+
+		return trim("{$this->nombres} {$this->apellidos} {$this->apellido_materno}");
 	}
 }
