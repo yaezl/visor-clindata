@@ -1,0 +1,40 @@
+.topbar {
+    background: var(--hu-surface);
+    height: 90px;
+    border-bottom: 1px solid var(--hu-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.topbar-title {
+    font-size: 10px;
+    color: var(--hu-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.topbar-greeting {
+    margin-top: 2px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--hu-primary);
+    color: var(--hu-surface);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+}
