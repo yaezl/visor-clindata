@@ -33,4 +33,27 @@ class EventohcService
             ->with(['tipocontenido', 'persona'])
             ->findOrFail($id);
     }
+
+    /**
+     * Historial clínico completo de una persona para la línea de tiempo
+     * del detalle de paciente (consultas, diagnósticos e informes de
+     * estudio ya resueltos, ordenado del más reciente al más antiguo).
+     */
+    public function historial(int $personaId, int $porPagina = 15): LengthAwarePaginator
+    {
+        return Eventohc::query()
+            ->where('persona_id', $personaId)
+            ->with([
+                'tipocontenido',
+                'consulta.consulta_tipo_egreso',
+                'consulta.personal.persona',
+                'consulta.consultadetalles.diagnostico_detalles.diagnostico',
+                'informedeestudios.estudio',
+                'informedeestudios.diagnostico',
+                'informedeestudios.usuario.personal.persona',
+            ])
+            ->orderByDesc('fechahora')
+            ->paginate($porPagina)
+            ->withQueryString();
+    }
 }

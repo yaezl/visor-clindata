@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Services\PersonaService;
+use App\Services\EventohcService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class PersonaController extends Controller
 {
-    public function __construct(protected PersonaService $personaService)
-    {
+    public function __construct(
+        protected PersonaService $personaService,
+        protected EventohcService $eventohcService,
+    ) {
     }
 
     public function index(Request $request): View|JsonResponse
@@ -39,6 +42,8 @@ class PersonaController extends Controller
             return response()->json($persona);
         }
 
-        return view('patients.show', compact('persona'));
+        $historial = $this->eventohcService->historial($id);
+
+        return view('patients.show', compact('persona', 'historial'));
     }
 }
