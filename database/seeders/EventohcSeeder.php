@@ -16,13 +16,15 @@ class EventohcSeeder extends Seeder
 
         $tipoConsulta = Tipocontenido::where('nombre', 'Consulta')->firstOrFail();
 
-        foreach (Persona::all() as $persona) {
+        // Solo los pacientes (documentos que NO son de personal médico)
+        // reciben eventos de historia clínica.
+        $pacientes = Persona::whereNotIn('documento', PersonalSeeder::DOCUMENTOS_PERSONAL_MEDICO)->get();
+
+        foreach ($pacientes as $persona) {
 
             $fechas = [
-                now()->subYear(),
-                now()->subMonths(6),
-                now()->subMonths(2),
-                now()->subDays(10),
+                now()->subMonths(3),
+                now()->subDays(15),
             ];
 
             foreach ($fechas as $fecha) {

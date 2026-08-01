@@ -21,14 +21,17 @@ class DatabaseSeeder extends Seeder
 
         // Ejecutamos los demás seeders
         $this->call([
-            PersonaSeeder::class,
+            PersonalSeeder::class,      // Crea Dra. Fernández (Persona+Personal) + Usuario legacy "sistema"
+            GrupoSanguineoSeeder::class, // Usa el Usuario recién creado
+            PersonaSeeder::class,        // Usa el Usuario recién creado + grupo_sanguineo
             DiagnosticoSeeder::class,
             TipoContenidoSeeder::class,
-            PersonalSeeder::class,
             EventohcSeeder::class,
             ConsultumSeeder::class,
             ConsultadetalleSeeder::class,
             DiagnosticoDetalleSeeder::class,
+            AlergiaSeeder::class,
+            MedicacionSeeder::class,
         ]);
     }
 }

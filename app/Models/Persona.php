@@ -552,6 +552,15 @@ class Persona extends Model
 	{
 		return $this->hasOne(Personal::class);
 	}
+	public function alergias()
+	{
+		return $this->hasMany(Alergia::class);
+	}
+
+	public function medicaciones()
+	{
+		return $this->hasMany(Medicacion::class);
+	}
 
 	public function rud_ruds()
 	{

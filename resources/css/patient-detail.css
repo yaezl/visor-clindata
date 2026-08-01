@@ -1,0 +1,276 @@
+/* ── Botón volver ───────────────────────────────── */
+.patient-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hu-text-secondary);
+    font-weight: 500;
+    font-size: .9rem;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+}
+
+.patient-back-link:hover {
+    color: var(--hu-primary);
+}
+
+/* ── Header de paciente ─────────────────────────── */
+.patient-detail-header {
+    background: var(--hu-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+}
+
+.patient-detail-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.patient-detail-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.patient-detail-avatar {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #D8E6F7, #EAF1FB);
+    color: var(--hu-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hu-border);
+}
+
+.patient-detail-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--hu-text);
+    margin: 0 0 4px;
+}
+
+.patient-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: .87rem;
+    color: var(--hu-text-secondary);
+}
+
+.patient-detail-meta .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--hu-text-secondary);
+    display: inline-block;
+}
+
+.blood-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #FDEBEC;
+    color: #C0392B;
+    font-weight: 700;
+    font-size: .76rem;
+}
+
+/* ── Botón "Historia Clínica" (header) ───────────── */
+.btn-detail-history {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--hu-primary);
+    background: var(--hu-primary);
+    color: var(--hu-surface);
+    font-weight: 600;
+    padding: 10px 22px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: .88rem;
+}
+
+.btn-detail-history:hover {
+    background: var(--hu-primary-hover);
+    border-color: var(--hu-primary-hover);
+    color: var(--hu-surface);
+}
+
+.btn-detail-history i {
+    font-size: 1rem;
+}
+
+/* ── Fila de info clínica extra (bajo la identidad) ──────────── */
+.patient-detail-info-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hu-border);
+}
+
+.patient-info-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.patient-info-chip-label {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--hu-text-secondary);
+}
+
+.patient-info-chip-value {
+    font-size: .89rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.patient-info-chip-value.text-danger {
+    color: #C0392B;
+}
+
+.patient-info-chip-sub {
+    font-size: .76rem;
+    color: var(--hu-text-secondary);
+    font-weight: 400;
+}
+
+/* ── Tabs principales (4 cards grandes, todas azules) ───── */
+.patient-main-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.patient-main-tab {
+    background: var(--hu-primary);
+    border: 2px solid var(--hu-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--hu-surface);
+    font-weight: 600;
+    font-size: .88rem;
+}
+
+.patient-main-tab i {
+    font-size: 1.4rem;
+    color: var(--hu-surface);
+    transition: var(--transition);
+}
+
+.patient-main-tab:hover {
+    background: var(--hu-primary-hover);
+    border-color: var(--hu-primary-hover);
+    transform: translateY(-2px);
+}
+
+.patient-main-tab.active {
+    border-color: var(--hu-secondary);
+    box-shadow: 0 0 0 3px rgba(199, 163, 110, .35), 0 6px 16px rgba(0, 55, 100, .22);
+}
+/* ── Panel de contenido de tabs ─────────────────── */
+.patient-tab-panel {
+    background: var(--hu-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 26px 28px;
+    margin-bottom: 16px;
+    min-height: 160px;
+    line-height: 1.6;
+}
+
+.patient-tab-panel h4 {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--hu-primary);
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.patient-tab-panel p {
+    font-size: .92rem;
+    color: var(--hu-text);
+}
+
+.patient-tab-empty {
+    color: var(--hu-text-secondary);
+    font-size: .88rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.patient-tab-empty::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--hu-border);
+    display: inline-block;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 992px) {
+    .patient-detail-info-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .patient-main-tabs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .patient-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .patient-detail-info-row {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-detail-header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-detail-history {
+        justify-content: center;
+    }
+    .patient-main-tabs {
+        grid-template-columns: 1fr;
+    }
+}

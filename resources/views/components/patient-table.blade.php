@@ -17,7 +17,7 @@
                 <tr
                     class="patient-row"
                     @if(isset($patient['id']))
-                        onclick="window.location='{{ route('patients.show', $patient['id']) }}'"
+                        onclick="window.location='{{ route('patients.detail', $patient['id']) }}'"
                         style="cursor:pointer"
                     @endif
                 >
