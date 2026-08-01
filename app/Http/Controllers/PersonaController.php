@@ -54,4 +54,16 @@ class PersonaController extends Controller
 
         return view('patients.show', compact('persona', 'historial'));
     }
+
+    /**
+     * Vista de detalle de paciente (header + tabs + accesos rápidos).
+     * Usa datos reales: última consulta con el médico real, patologías,
+     * alergias activas y medicación activa.
+     */
+    public function detail(int $id): View
+    {
+        $datos = $this->personaService->buscarParaDetalle($id);
+
+        return view('patients.detail', $datos);
+    }
 }

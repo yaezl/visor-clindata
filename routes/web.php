@@ -24,9 +24,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     // Datos de pacientes / historia clínica: SIEMPRE protegidos por auth.
     Route::resource('patients', PersonaController::class)->only(['index', 'show']);
+    // Detalle de paciente (header + tabs + accesos rápidos)
+    Route::get('/patients/{id}/detail', [PersonaController::class, 'detail'])
+        ->whereNumber('id')
+        ->name('patients.detail');
     Route::resource('consultas', ConsultaController::class)->only(['index', 'show']);
     Route::resource('diagnosticos', DiagnosticoController::class)->only(['index', 'show']);
     Route::resource('eventos', EventohcController::class)->only(['index', 'show']);
@@ -38,7 +41,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/urgentes', [InformedeestudioController::class, 'urgentes'])->name('urgentes');
     });
     Route::resource('informes-de-estudio', InformedeestudioController::class)->only(['index', 'show']);
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
