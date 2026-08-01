@@ -9,15 +9,16 @@ use App\Http\Controllers\AntecedentepatologicoController;
 use App\Http\Controllers\HcVacunaController;
 use App\Http\Controllers\HcAplicacionVacunaController;
 use App\Http\Controllers\InformedeestudioController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
