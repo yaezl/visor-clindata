@@ -1,0 +1,72 @@
+.sidebar {
+    width: 250px;
+    background: var(--hu-surface);
+    border-right: 1px solid var(--hu-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    height: 105px;
+    display: flex;
+    align-items: center;
+    padding: 28px;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 24px 16px;
+}
+
+.sidebar-footer {
+    padding: 20px 16px;
+    border-top: 1px solid var(--hu-border);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 52px;
+    padding: 0 16px;
+    color: var(--hu-text-secondary);
+    border-radius: 14px;
+    transition: .2s;
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    background: var(--hu-background);
+    color: var(--hu-primary);
+}
+
+.sidebar-link.active {
+    background: var(--hu-background);
+    color: var(--hu-primary);
+}
+
+.sidebar-link i {
+    font-size: 22px;
+}
+
+/* ── Sidebar Brand ──────────────────────────────── */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.sidebar-brand-icon img {
+    width: 70px;
+}
+
+.sidebar-brand-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--hu-primary);
+    letter-spacing: -.02em;
+}

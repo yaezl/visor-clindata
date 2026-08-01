@@ -1,0 +1,93 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--hu-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-background {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right,
+        rgba(255,255,255,.08) 0,
+        rgba(255,255,255,.08) 220px,
+        transparent 221px),
+
+        radial-gradient(circle at bottom left,
+        rgba(255,255,255,.05) 0,
+        rgba(255,255,255,.05) 180px,
+        transparent 181px);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 480px; 
+    max-height: calc(100vh - 4rem);
+    background: var(--hu-surface);
+    border-top: 8px solid var(--hu-secondary); 
+    border-radius: 24px;
+    position: relative;
+    z-index: 2;
+    padding: 2.5rem 2.75rem;
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+}
+
+.login-logo {
+    text-align: center;
+}
+
+.login-logo img {
+    width: 90px;
+}
+
+.login-title {
+    margin-top: 18px;
+    text-align: center;
+    color: var(--hu-primary);
+    font-weight: 700;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: var(--hu-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    color: #9AA4B2;
+}
+
+.login-button {
+    height: 50px;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.forgot-password {
+    color: var(--hu-primary);
+    font-size: .95rem;
+}
+
+.login-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hu-border);
+    text-align: center;
+    color: #9AA4B2;
+    font-size: .9rem;
+}

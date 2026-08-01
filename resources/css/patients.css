@@ -1,0 +1,64 @@
+/* ── Search Bar ─────────────────────────────────── */
+.search-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--hu-text-secondary);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+#searchInput {
+    padding-left: 44px;
+    border-radius: 16px;
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    font-size: .95rem;
+    height: 48px;
+}
+
+.search-input:focus {
+    border-color: var(--hu-primary);
+    box-shadow: 0 0 0 .15rem rgba(0, 55, 100, .12);
+}
+
+#botonFiltros {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid var(--hu-border);
+    background: var(--hu-surface);
+    color: var(--hu-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+#botonFiltros:hover {
+    border-color: var(--hu-primary);
+    color: var(--hu-primary);
+}
+
+/* ── Results label ──────────────────────────────── */
+.search-results-label {
+    font-size: .9rem;
+    color: var(--hu-text-secondary);
+}
+
+.search-results-label strong {
+    color: var(--hu-text);
+}
