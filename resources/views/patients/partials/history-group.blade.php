@@ -30,32 +30,21 @@ $historialAgrupado = $historial
 
     @endphp
 
-    <div class="mb-5 historial-mes">
+    <div class="history-month historial-mes">
 
-        <div
-            class="d-flex align-items-center mb-4">
+        <div class="month-divider">
 
-            <div
-                style="
-                    width:8px;
-                    height:34px;
-                    background:#003764;
-                    border-radius:8px;
-                    margin-right:14px;
-                ">
-            </div>
+            <div class="month-divider-line"></div>
 
-            <h3
-                class="fw-bold m-0"
-                style="
-                    color:#003764;
-                    font-size:28px;
-                ">
+            <div class="month-badge">
 
-                {{ $meses[$fecha->month] }}
+                {{ strtoupper($meses[$fecha->month]) }}
+
                 {{ $fecha->year }}
 
-            </h3>
+            </div>
+
+            <div class="month-divider-line"></div>
 
         </div>
 

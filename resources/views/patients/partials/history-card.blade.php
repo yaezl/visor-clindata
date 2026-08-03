@@ -15,26 +15,39 @@ if ($consulta) {
 
 $collapseId = 'evento-'.$evento->id;
 
+$tipo = $evento->tipocontenido->nombre ?? 'Consulta';
+
+$iconos = [
+    'Consulta' => 'stethoscope',
+    'Estudio' => 'biotech',
+    'Internación' => 'local_hospital',
+];
+
+$icono = $iconos[$tipo] ?? 'description';
+
+$diagnosticoPrincipal = $diagnosticos->first()?->diagnostico?->nombre
+    ?? 'Sin diagnóstico registrado';
+
 @endphp
 
 <div
-    class="accordion mb-3 historial-item"
+    class="accordion history-card historial-item"
 
-    data-tipo="{{ strtolower($evento->tipocontenido->nombre ?? 'consulta') }}"
+    data-tipo="{{ strtolower($tipo) }}"
 
-    data-fecha="{{ \Carbon\Carbon::parse($evento->fechahora)->format('d/m/Y') }}"
+    data-fecha="{{ optional($evento->fechahora)->format('d/m/Y') }}"
 
     data-texto="
         {{ strtolower($diagnosticos->pluck('diagnostico.nombre')->implode(' ')) }}
         {{ strtolower($detalle?->sintomas_signos ?? '') }}
         {{ strtolower($detalle?->funciones_biologicas ?? '') }}
         {{ strtolower($detalle?->cremiento_desarrollo ?? '') }}
-        {{ \Carbon\Carbon::parse($evento->fechahora)->format('d/m/Y') }}
+        {{ optional($evento->fechahora)->format('d/m/Y') }}
     "
 
     id="accordion-{{ $evento->id }}">
 
-    <div class="accordion-item border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="accordion-item">
 
         <h2 class="accordion-header">
 
@@ -44,77 +57,45 @@ $collapseId = 'evento-'.$evento->id;
                 data-bs-toggle="collapse"
                 data-bs-target="#{{ $collapseId }}">
 
-                <div class="w-100">
+                <div class="history-header">
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="history-row">
 
                         <div>
 
-                            <span
-                                class="badge rounded-pill"
-                                style="background:#003764;">
+                            <div class="history-type">
+                                {{ strtoupper($tipo) }}
+                            </div>
 
-                                {{ $evento->tipocontenido->nombre ?? 'Consulta' }}
+                            <div class="history-title">
+                                {{ $diagnosticoPrincipal }}
+                            </div>
 
-                            </span>
+                            @if($medico)
+                                <div class="history-doctor">
+                                    Dr./Dra.
+                                    {{ $medico->nombres }}
+                                    {{ $medico->apellidos }}
+                                </div>
+                            @endif
 
                         </div>
 
-                        <small class="text-muted">
+                        <div class="history-right">
 
-                            {{ \Carbon\Carbon::parse($evento->fechahora)->format('d/m/Y H:i') }}
+                            <div class="history-date">
+                                {{ optional($evento->fechahora)->format('d/m/Y') }}
+                            </div>
 
-                        </small>
+                            <div class="history-hour">
+                                {{ optional($evento->fechahora)->format('H:i') }}
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <h5
-                        class="fw-bold mt-3 mb-2"
-                        style="color:#003764;">
-
-                        {{ $diagnosticos->first()?->diagnostico?->nombre ?? 'Sin diagnóstico registrado' }}
-
-                    </h5>
-
-                    @if($medico)
-
-                        <div class="text-muted">
-
-                            Dr./Dra.
-
-                            {{ $medico->apellidos }}
-
-                            {{ $medico->nombres }}
-
-                        </div>
-
-                    @endif
-
-                    @if($diagnosticos->isNotEmpty())
-
-                        <div class="mt-3">
-
-                            @foreach($diagnosticos as $diag)
-
-                                <span
-                                    class="badge rounded-pill me-2 mb-2"
-                                    style="
-                                        background:#C7A36E;
-                                        color:white;
-                                    ">
-
-                                    {{ $diag->diagnostico->nombre }}
-
-                                </span>
-
-                            @endforeach
-
-                        </div>
-
-                    @endif
-
                 </div>
-
             </button>
 
         </h2>
@@ -125,7 +106,11 @@ $collapseId = 'evento-'.$evento->id;
 
             <div class="accordion-body">
 
-                @include('patients.partials.history-detail')
+                <div class="history-detail">
+
+                    @include('patients.partials.history-detail')
+
+                </div>
 
             </div>
 
