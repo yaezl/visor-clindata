@@ -20,6 +20,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::get('/calendar', [DashboardController::class, 'calendar'])
+    ->middleware(['auth', 'verified'])
+    ->name('calendar');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

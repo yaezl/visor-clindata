@@ -10,7 +10,7 @@ class DashboardService
 {
     /**
      * Devuelve los turnos programados para el día indicado (hoy por defecto),
-     * con los datos de la persona ya resueltos.
+     * con los datos de la persona y el estado_turno ya resueltos.
      *
      * TODO(backend): Filtrar también por el profesional logueado.
      * Hoy `TurnoProgramado` no tiene una FK directa a `personal_id`; llega a
@@ -30,27 +30,67 @@ class DashboardService
     }
 
     /**
-     * Arma los contadores del día (total / atendidos / pendientes) a partir
-     * de los turnos reales, en base al estado_turno de cada uno.
+     * Arma los contadores del día a partir de los turnos reales.
+     *
+     * Lógica de clasificación (en orden de prioridad):
+     *   - "atendido"   → nombre del estado contiene 'atend'
+     *   - "en_consulta"→ nombre del estado contiene 'consul' o 'curso'
+     *   - "arribado"   → fechahora_arribo está presente y no es nulo
+     *   - "pendiente"  → todo lo demás
      *
      * TODO(backend): Confirmar con el equipo qué IDs/nombres de EstadoTurno
-     * corresponden a "atendido" en la base de Alephoo (acá se infiere por
-     * nombre para no depender de un ID mágico).
+     * corresponden a cada categoría en la BD de Alephoo.
      */
     public function estadisticasDelDia(Collection $turnos): array
     {
-        $atendidos = $turnos->filter(function ($turno) {
-            $estado = optional($turno->estado_turno)->nombre;
+        $atendidos   = 0;
+        $en_consulta = 0;
+        $arribados   = 0;
+        $pendientes  = 0;
 
-            return $estado && str_contains(mb_strtolower($estado), 'atend');
-        })->count();
+        foreach ($turnos as $turno) {
+            $estado = mb_strtolower(optional($turno->estado_turno)->nombre ?? '');
 
-        $total = $turnos->count();
+            if (str_contains($estado, 'atend')) {
+                $atendidos++;
+            } elseif (str_contains($estado, 'consul') || str_contains($estado, 'curso')) {
+                $en_consulta++;
+            } elseif (!is_null($turno->fechahora_arribo) || str_contains($estado, 'arrib')) {
+                $arribados++;
+            } else {
+                $pendientes++;
+            }
+        }
 
         return [
-            'total' => $total,
-            'atendidos' => $atendidos,
-            'pendientes' => $total - $atendidos,
+            'total'       => $turnos->count(),
+            'atendidos'   => $atendidos,
+            'en_consulta' => $en_consulta,
+            'arribados'   => $arribados,
+            'pendientes'  => $pendientes,
         ];
+    }
+
+    /**
+     * Devuelve la "etiqueta de estado" que se muestra en la tabla del dashboard.
+     * Centralizado acá para que la misma lógica sirva también en futuros endpoints API.
+     */
+    public static function etiquetaEstado(TurnoProgramado $turno): array
+    {
+        $estado = mb_strtolower(optional($turno->estado_turno)->nombre ?? '');
+
+        if (str_contains($estado, 'atend')) {
+            return ['label' => 'Atendido',    'css' => 'badge-atendido'];
+        }
+
+        if (str_contains($estado, 'consul') || str_contains($estado, 'curso')) {
+            return ['label' => 'En consulta', 'css' => 'badge-en-consulta'];
+        }
+
+        if (!is_null($turno->fechahora_arribo) || str_contains($estado, 'arrib')) {
+            return ['label' => 'Arribado',    'css' => 'badge-arribado'];
+        }
+
+        return ['label' => 'Pendiente', 'css' => 'badge-pendiente'];
     }
 }

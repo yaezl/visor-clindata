@@ -1,6 +1,7 @@
 @props([
     'patients'    => collect(),
-    'showControl' => true,   // true = muestra Último Control (dashboard), false = muestra Nro HC (pacientes)
+    'showControl' => true,    // true = Último Control (dashboard), false = Nro HC (pacientes)
+    'showEstado'  => false,   // true = columna Estado (solo dashboard)
 ])
 
 <div class="patient-table-wrapper">
@@ -9,7 +10,13 @@
             <tr>
                 <th>Paciente</th>
                 <th>DNI</th>
+                @if ($showEstado)
+                    <th>Turno</th>
+                @endif
                 <th>{{ $showControl ? 'Último Control' : 'Nro. Historia Clínica' }}</th>
+                @if ($showEstado)
+                    <th>Estado</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -21,7 +28,7 @@
                         style="cursor:pointer"
                     @endif
                 >
-                    {{-- Avatar con iniciales --}}
+                    {{-- Avatar + nombre --}}
                     <td>
                         <div class="patient-cell">
                             <span class="patient-avatar">
@@ -37,15 +44,24 @@
                         </div>
                     </td>
 
+                    {{-- DNI --}}
                     <td class="patient-dni">
                         {{ $patient['dni']
                             ? number_format((int) str_replace('.', '', $patient['dni']), 0, ',', '.')
                             : '—' }}
                     </td>
 
+                    {{-- Hora de turno (solo dashboard) --}}
+                    @if ($showEstado)
+                        <td class="patient-hora">
+                            <strong>{{ $patient['hora'] ?? '—' }}</strong>
+                        </td>
+                    @endif
+
+                    {{-- Último control / Nro HC --}}
                     <td class="patient-secondary">
                         @if ($showControl)
-                            {{ $patient['control']
+                            {{ isset($patient['control']) && $patient['control']
                                 ? \Carbon\Carbon::parse($patient['control'])->format('d/m/Y')
                                 : '—' }}
                         @else
@@ -53,14 +69,26 @@
                         @endif
                     </td>
 
-                    {{-- Flecha visible on-hover (CSS la muestra) --}}
+                    {{-- Badge de estado (solo dashboard) --}}
+                    @if ($showEstado)
+                        <td class="patient-estado">
+                            <span class="estado-badge {{ $patient['estado_css'] ?? 'badge-pendiente' }}">
+                                <span class="estado-dot"></span>
+                                {{ $patient['estado_label'] ?? 'Pendiente' }}
+                            </span>
+                        </td>
+                    @endif
+
+                    {{-- Ícono hover: estetoscopio --}}
                     <td class="patient-arrow">
-                        <i class="bi bi-chevron-right"></i>
+                        <i class="fa-solid fa-stethoscope"></i>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="patient-empty">Sin resultados</td>
+                    <td colspan="{{ $showEstado ? 6 : 4 }}" class="patient-empty">
+                        Sin pacientes programados para hoy
+                    </td>
                 </tr>
             @endforelse
         </tbody>

@@ -1,7 +1,7 @@
 @props([
     'label'  => '',
     'value'  => 0,
-    'color'  => 'primary',   // primary | success | warning
+    'color'  => 'primary',   // primary | success | warning | info
 ])
 
 <div class="stats-card">
