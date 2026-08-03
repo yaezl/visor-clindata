@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             GrupoSanguineoSeeder::class, // Usa el Usuario recién creado
             PersonaSeeder::class,        // Usa el Usuario recién creado + grupo_sanguineo
             DiagnosticoSeeder::class,
+            AntecedenteperinatalSeeder::class, // Usa Persona + Diagnostico
+            AntecedentepatologicoSeeder::class, // Usa Persona + Diagnostico
             TipoContenidoSeeder::class,
             EventohcSeeder::class,
             ConsultumSeeder::class,

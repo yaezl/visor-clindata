@@ -4,73 +4,102 @@ namespace Database\Seeders;
 
 use App\Models\Consultadetalle;
 use App\Models\Consultum;
+use App\Models\Diagnostico;
+use App\Models\DiagnosticoDetalle;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Genera Consultadetalle + su DiagnosticoDetalle correspondiente en el
+ * mismo lugar, a partir de un unico "caso clinico" (ver
+ * CasosClinicosPediatricos), para que el motivo de consulta, el examen
+ * fisico y el diagnostico sean siempre coherentes entre si.
+ *
+ * Reemplaza la logica anterior, donde ConsultadetalleSeeder y
+ * DiagnosticoDetalleSeeder eran independientes y podian generar
+ * combinaciones sin sentido clinico (ej: motivo "tos" + diagnostico
+ * "Diabetes mellitus").
+ */
 class ConsultadetalleSeeder extends Seeder
 {
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
 
-        // Obtener todas las consultas creadas
-        $consultas = Consultum::all();
+        $casos = CasosClinicosPediatricos::casos();
 
-        foreach ($consultas as $consulta) {
-            // Crear un detalle por consulta con datos realistas
-            Consultadetalle::create([
-                'consulta_id' => $consulta->id,
-                'dtype' => 'Consultadetalle',
-                'creadopor_id' => 1,
-                'modificadopor_id' => 1,
-                'borradopor_id' => 0,
-                'creado_en' => now(),
-                'finalidad_consulta_id' => 1, // Control médico
-                'causa_externa_id' => null,
-                'incapacidad_id' => null,
-                'cremiento_desarrollo' => $this->datosCrecimiento(),
-                'funciones_biologicas' => $this->datosFunciones(),
-                'sintomas_signos' => $this->datosSintomas(),
-                'proxima_cita' => now()->addMonth(),
-            ]);
+        // Mapa codigocie10 => Diagnostico, para no golpear la BD en cada
+        // iteracion.
+        $diagnosticosPorCodigo = Diagnostico::whereIn(
+            'codigocie10',
+            collect($casos)->pluck('codigocie10')->unique()
+        )->get()->keyBy('codigocie10');
+
+        // Se recorren las consultas ordenadas por fecha para que, dentro
+        // de la historia de un mismo paciente, no se repita el mismo
+        // caso clinico dos veces seguidas (mas realista).
+        $consultasPorPaciente = Consultum::with('eventohc')
+            ->get()
+            ->filter(fn ($consulta) => $consulta->eventohc !== null)
+            ->sortBy(fn ($consulta) => $consulta->eventohc->fechahora)
+            ->groupBy(fn ($consulta) => $consulta->eventohc->persona_id);
+
+        foreach ($consultasPorPaciente as $consultas) {
+
+            $ultimoCodigoUsado = null;
+
+            foreach ($consultas as $consulta) {
+
+                $caso = $this->elegirCasoDistintoAlAnterior($casos, $ultimoCodigoUsado);
+                $ultimoCodigoUsado = $caso['codigocie10'];
+
+                $detalle = Consultadetalle::create([
+                    'consulta_id' => $consulta->id,
+                    'dtype' => 'Consultadetalle',
+                    'creadopor_id' => 1,
+                    'modificadopor_id' => 1,
+                    'borradopor_id' => 0,
+                    'creado_en' => now(),
+                    'finalidad_consulta_id' => 1, // Control medico
+                    'causa_externa_id' => null,
+                    'incapacidad_id' => null,
+                    'cremiento_desarrollo' => $caso['crecimiento_desarrollo'],
+                    'funciones_biologicas' => $caso['funciones_biologicas'],
+                    'sintomas_signos' => $caso['sintomas_signos'],
+                    'proxima_cita' => $consulta->eventohc->fechahora->copy()->addMonth(),
+                ]);
+
+                $diagnostico = $diagnosticosPorCodigo->get($caso['codigocie10']);
+
+                if ($diagnostico) {
+                    DiagnosticoDetalle::create([
+                        'diagnostico_id' => $diagnostico->id,
+                        'detalle_id' => $detalle->id,
+                        'orden' => 1,
+                        'textodiagnostico' => $diagnostico->nombre,
+                        'es_confirmado' => 1,
+                        'tipo_diagnostico_principal_id' => 1,
+                    ]);
+                }
+            }
         }
 
         Schema::enableForeignKeyConstraints();
     }
 
-    private function datosSintomas(): string
+    /**
+     * @param array<int, array> $casos
+     */
+    protected function elegirCasoDistintoAlAnterior(array $casos, ?string $ultimoCodigoUsado): array
     {
-        $opciones = [
-            "Paciente asintomático en el momento de la consulta.\nBuen estado general.\nAfebril.",
-            "Refiere tos leve de 3 días de evolución.\nRinofaringitis viral.\nSin fiebre actualmente.",
-            "Dolor abdominal leve en región periumbilical.\nEvolucionó favorablemente con tratamiento sintomático.\nMayor actividad que en consulta anterior.",
-            "Fiebre de 5 días de evolución.\nEstudios complementarios realizados.\nExamen físico compatible con infección viral.",
-            "Paciente refiere sensación de malestar general.\nBuen estado general al examen.\nFunciones biológicas conservadas.",
-        ];
-        return $opciones[array_rand($opciones)];
-    }
+        if (count($casos) === 1) {
+            return $casos[array_key_first($casos)];
+        }
 
-    private function datosFunciones(): string
-    {
-        $opciones = [
-            "Apetito conservado.\nSueño normal.\nDepositaciones normales.\nMicciones sin particularidades.",
-            "Apetito aumentado.\nSueño tranquilo.\nDepositaciones normales.\nMicciones frecuentes pero sin disuria.",
-            "Apetito disminuido durante los últimos 2 días.\nSueño interrumpido.\nDepositaciones normales en cantidad y consistencia.\nMicciones sin alteraciones.",
-            "Apetito conservado.\nSueño normal.\nDepositaciones normales.\nDiuresis adecuada.",
-            "Funciones biológicas dentro de los parámetros normales para su edad.",
-        ];
-        return $opciones[array_rand($opciones)];
-    }
+        do {
+            $caso = $casos[array_rand($casos)];
+        } while ($caso['codigocie10'] === $ultimoCodigoUsado);
 
-    private function datosCrecimiento(): string
-    {
-        $opciones = [
-            "Crecimiento y desarrollo adecuado para su edad.\nCurva de crecimiento dentro de los percentiles normales.",
-            "Desarrollo psicomotor normal.\nCrecimiento estatural y ponderal acorde con su edad cronológica.",
-            "Paciente con adecuado crecimiento lineal.\nDesarrollo madurativo normal para su edad.",
-            "Evolución favorable del crecimiento.\nNo se evidencian alteraciones del desarrollo.",
-            "Crecimiento sostenido dentro de los rangos normales.\nMadurez ósea concordante con la edad biológica.",
-        ];
-        return $opciones[array_rand($opciones)];
+        return $caso;
     }
 }
