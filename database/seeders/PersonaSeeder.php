@@ -32,7 +32,9 @@ class PersonaSeeder extends Seeder
             ]
         );
 
-        // ── Pacientes de prueba ──────────────────────────────────────
+        // ── Pacientes de prueba (todos pediátricos, área de Pediatría) ─
+        // Edades variadas a propósito: desde lactantes hasta preadolescentes,
+        // para poder probar el Resumen con historias cortas y largas.
         $pacientes = [
             [
                 'nombres' => 'Juan',
@@ -40,7 +42,7 @@ class PersonaSeeder extends Seeder
                 'documento' => '12345678',
                 'sexo' => 'M',
                 'genero' => 'M',
-                'fecha_nacimiento' => '1985-05-20',
+                'fecha_nacimiento' => now()->subYears(3)->subMonths(2)->toDateString(),
             ],
             [
                 'nombres' => 'María',
@@ -48,7 +50,7 @@ class PersonaSeeder extends Seeder
                 'documento' => '87654321',
                 'sexo' => 'F',
                 'genero' => 'F',
-                'fecha_nacimiento' => '1992-10-15',
+                'fecha_nacimiento' => now()->subMonths(9)->toDateString(),
             ],
             [
                 'nombres' => 'Carlos',
@@ -56,7 +58,7 @@ class PersonaSeeder extends Seeder
                 'documento' => '67245356',
                 'sexo' => 'M',
                 'genero' => 'M',
-                'fecha_nacimiento' => '2016-05-12',
+                'fecha_nacimiento' => now()->subYears(2)->subMonths(1)->toDateString(),
                 'nro_hc' => 1432567,
                 'grupo_sanguineo_id' => $grupoAPositivo->id,
                 'contacto_celular_codigo' => 261,
@@ -68,7 +70,7 @@ class PersonaSeeder extends Seeder
                 'documento' => '41555666',
                 'sexo' => 'F',
                 'genero' => 'F',
-                'fecha_nacimiento' => '2001-02-08',
+                'fecha_nacimiento' => now()->subYears(7)->subMonths(4)->toDateString(),
             ],
             [
                 'nombres' => 'Ramón',
@@ -76,40 +78,18 @@ class PersonaSeeder extends Seeder
                 'documento' => '20444555',
                 'sexo' => 'M',
                 'genero' => 'M',
-                'fecha_nacimiento' => '1958-11-30',
+                'fecha_nacimiento' => now()->subYears(11)->subMonths(6)->toDateString(),
             ],
         ];
 
-        // ── Personal médico de prueba ────────────────────────────────
-        // (mismos documentos que self::DOCUMENTOS_MEDICOS)
-        $medicos = [
-            [
-                'nombres' => 'Laura',
-                'apellidos' => 'Fernández',
-                'documento' => '30111222',
-                'sexo' => 'F',
-                'genero' => 'F',
-                'fecha_nacimiento' => '1980-03-15',
-            ],
-            [
-                'nombres' => 'Martín',
-                'apellidos' => 'Suárez',
-                'documento' => '30222333',
-                'sexo' => 'M',
-                'genero' => 'M',
-                'fecha_nacimiento' => '1975-07-22',
-            ],
-            [
-                'nombres' => 'Valeria',
-                'apellidos' => 'Torres',
-                'documento' => '30333444',
-                'sexo' => 'F',
-                'genero' => 'F',
-                'fecha_nacimiento' => '1988-12-01',
-            ],
-        ];
+        // El personal médico (Laura, Martín, Valeria, Diego) se crea en
+        // PersonalSeeder junto con su registro Personal correspondiente.
+        // Acá NO se agregan de nuevo: si se cargaran también en Persona
+        // sin su Personal asociado, whereDoesntHave('personal') del
+        // listado de pacientes no los filtraría y aparecerían como
+        // pacientes duplicados.
 
-        foreach (array_merge($pacientes, $medicos) as $persona) {
+        foreach ($pacientes as $persona) {
             // Generamos un ID gigante al azar para evitar cualquier "Duplicate entry"
             $idFalso = rand(100000, 999999);
 

@@ -2,6 +2,11 @@
     Vista de Detalle de Paciente
     ----------------------------
     Datos reales conectados vía PersonaController@detail -> PersonaService@buscarParaDetalle.
+
+    Los 4 bloques (Resumen, Antecedentes, Vacunación, Control de
+    crecimiento) son acordeones idénticos en look & feel. El contenido
+    de cada uno vive en su propio partial bajo patients/partials/, para
+    poder editarlos sin tocar este archivo.
 --}}
 
 @php
@@ -9,6 +14,34 @@
     $resumen = "Paciente de {$edad} años en seguimiento regular. "
         . "Presenta {$alergias_count} " . ($alergias_count === 1 ? 'alergia registrada' : 'alergias registradas')
         . ($tiene_medicacion_activa ? " y medicación activa." : " y sin medicación activa.");
+
+    // Cada acordeón: id, icono, título y el partial que renderiza su contenido.
+    $acordeones = [
+        [
+            'id' => 'resumen',
+            'icono' => 'bi-clipboard2-pulse',
+            'titulo' => 'Resumen',
+            'partial' => 'patients.partials.summary-expandable',
+        ],
+        [
+            'id' => 'antecedentes',
+            'icono' => 'bi-journal-medical',
+            'titulo' => 'Antecedentes',
+            'partial' => 'patients.partials.antecedentes-expandable',
+        ],
+        [
+            'id' => 'vacunacion',
+            'icono' => 'bi-shield-plus',
+            'titulo' => 'Vacunación',
+            'partial' => 'patients.partials.vacunacion-expandable',
+        ],
+        [
+            'id' => 'crecimiento',
+            'icono' => 'bi-graph-up-arrow',
+            'titulo' => 'Control de crecimiento',
+            'partial' => 'patients.partials.crecimiento-expandable',
+        ],
+    ];
 @endphp
 
 <x-app-layout>
@@ -87,75 +120,46 @@
 
     </div>
 
-    {{-- ── 4 tabs principales ─────────────────────────────────────── --}}
-    <div class="patient-main-tabs" role="tablist">
+    {{-- ── 4 acordeones: Resumen, Antecedentes, Vacunación, Crecimiento ── --}}
+    @foreach($acordeones as $acordeon)
 
-        <button type="button" class="patient-main-tab" data-tab="resumen">
-            <i class="bi bi-clipboard2-pulse"></i>
-            Resumen
+        <button
+            type="button"
+            class="patient-summary-toggle"
+            id="toggle-{{ $acordeon['id'] }}"
+            data-target="panel-{{ $acordeon['id'] }}"
+            aria-expanded="false"
+            aria-controls="panel-{{ $acordeon['id'] }}"
+        >
+            <i class="bi {{ $acordeon['icono'] }}"></i>
+            {{ $acordeon['titulo'] }}
+            <i class="bi bi-chevron-down"></i>
         </button>
 
-        <button type="button" class="patient-main-tab" data-tab="antecedentes">
-            <i class="bi bi-journal-medical"></i>
-            Antecedentes
-        </button>
+        <div class="patient-summary-panel" id="panel-{{ $acordeon['id'] }}">
+            @include($acordeon['partial'])
+        </div>
 
-        <button type="button" class="patient-main-tab" data-tab="vacunacion">
-            <i class="bi bi-shield-plus"></i>
-            Vacunación
-        </button>
+    @endforeach
 
-        <button type="button" class="patient-main-tab" data-tab="crecimiento">
-            <i class="bi bi-graph-up-arrow"></i>
-            Control de crecimiento
-        </button>
-
-    </div>
-
-    {{-- ── Panel de contenido según tab activo ────────────────────── --}}
-    <div class="patient-tab-panel" data-panel="resumen">
-        <h4>Resumen</h4>
-        <p class="mb-0">{{ $resumen }}</p>
-    </div>
-
-    <div class="patient-tab-panel d-none" data-panel="antecedentes">
-        <h4>Antecedentes</h4>
-        <p class="patient-tab-empty">
-            Sin antecedentes patológicos ni heredofamiliares cargados aún para este paciente.
-        </p>
-    </div>
-
-    <div class="patient-tab-panel d-none" data-panel="vacunacion">
-        <h4>Alertas de vacunación</h4>
-        <p class="patient-tab-empty">
-            No hay alertas de vacunación cargadas para este paciente.
-        </p>
-    </div>
-
-    <div class="patient-tab-panel d-none" data-panel="crecimiento">
-        <h4>Control de crecimiento y desarrollo</h4>
-        <p class="patient-tab-empty">
-            Aún no hay mediciones de peso y talla cargadas para este paciente.
-        </p>
-    </div>
-
-    {{-- ── Scripts: tabs (vanilla JS, sin dependencias) ────────────── --}}
+    {{-- ── Scripts: acordeones (vanilla JS, sin dependencias) ──────── --}}
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        const tabs = document.querySelectorAll('.patient-main-tab');
-        const panels = document.querySelectorAll('.patient-tab-panel');
+        const toggles = document.querySelectorAll('.patient-summary-toggle');
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const target = tab.dataset.tab;
+        toggles.forEach(toggle => {
+            const panel = document.getElementById(toggle.dataset.target);
 
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
+            if (!panel) {
+                return;
+            }
 
-                panels.forEach(p => {
-                    p.classList.toggle('d-none', p.dataset.panel !== target);
-                });
+            toggle.addEventListener('click', () => {
+                const abierto = panel.classList.toggle('open');
+
+                toggle.classList.toggle('active', abierto);
+                toggle.setAttribute('aria-expanded', abierto ? 'true' : 'false');
             });
         });
 

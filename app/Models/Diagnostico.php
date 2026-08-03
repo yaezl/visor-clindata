@@ -67,6 +67,7 @@ class Diagnostico extends Model
 
 	protected $fillable = [
 		'nombre',
+		'categoria',
 		'modified_by',
 		'created_by',
 		'tipo_id',

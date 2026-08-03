@@ -82,6 +82,7 @@ class PersonaService
                 'alergias' => fn ($query) => $query->where('activa', true),
                 'medicaciones' => fn ($query) => $query->where('activa', true),
                 'antecedentepatologicos.diagnostico',
+                'antecedenteperinatals.antec_perinatal_diagnosticos.diagnostico',
                 'eventohcs' => function ($query) {
                     $query->whereHas('consulta')
                         ->with(['consulta.personal.persona'])

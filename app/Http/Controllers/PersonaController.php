@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\PersonaService;
 use App\Services\EventohcService;
+use App\Services\PatientSummaryService;
+use App\Services\AntecedenteService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -14,6 +16,8 @@ class PersonaController extends Controller
     public function __construct(
         protected PersonaService $personaService,
         protected EventohcService $eventohcService,
+        protected PatientSummaryService $patientSummaryService,
+        protected AntecedenteService $antecedenteService,
     ) {
     }
 
@@ -63,6 +67,9 @@ class PersonaController extends Controller
     public function detail(int $id): View
     {
         $datos = $this->personaService->buscarParaDetalle($id);
+
+        $datos['resumen_clinico'] = $this->patientSummaryService->resumenDe($datos['persona']);
+        $datos['antecedentes'] = $this->antecedenteService->antecedentesDe($datos['persona']);
 
         return view('patients.detail', $datos);
     }
