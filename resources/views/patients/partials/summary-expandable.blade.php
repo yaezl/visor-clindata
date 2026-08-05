@@ -11,7 +11,10 @@
 <div class="patient-summary-content">
 
     {{-- Texto resumen por plantilla (el que ya existía) --}}
-    <p class="patient-summary-intro mb-3">{{ $resumen }}</p>
+    <div class="patient-summary-intro mb-3">
+        <i class="bi bi-clipboard2-pulse"></i>
+        <span>{{ $resumen }}</span>
+    </div>
 
     {{-- Alerta de patrón: dato neutro, calculado por conteo simple --}}
     @if($resumen_clinico['patron_categoria'])
@@ -53,15 +56,17 @@
                 <ul class="patient-summary-list patient-summary-list--medicacion">
                     @foreach($resumen_clinico['medicacion_activa'] as $medicacion)
                         <li>
-                            <div class="patient-summary-med-nombre">{{ $medicacion['nombre'] }}</div>
-                            <div class="patient-summary-med-detalle">
+                            <div class="patient-summary-med-row">
+                                <span class="patient-summary-med-nombre">{{ $medicacion['nombre'] }}</span>
                                 @if($medicacion['dosis'])
-                                    <span>{{ $medicacion['dosis'] }}</span>
-                                @endif
-                                @if($medicacion['fecha_inicio'])
-                                    <span>Desde {{ $medicacion['fecha_inicio']->format('d/m/Y') }}</span>
+                                    <span class="patient-summary-med-dosis">{{ $medicacion['dosis'] }}</span>
                                 @endif
                             </div>
+                            @if($medicacion['fecha_inicio'])
+                                <div class="patient-summary-med-detalle">
+                                    <span>Desde {{ $medicacion['fecha_inicio']->format('d/m/Y') }}</span>
+                                </div>
+                            @endif
                         </li>
                     @endforeach
                 </ul>

@@ -20,9 +20,16 @@ class PersonaSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
-        // Grupo sanguíneo A+ para Carlos Gómez (si el catálogo ya trae
-        // datos reales del hospital, los reutiliza; si no, crea uno mínimo).
-        $grupoAPositivo = GrupoSanguineo::firstOrCreate(
+        // Grupos sanguíneos de los pacientes de prueba: uno por paciente,
+        // variados a propósito. Se resuelven por código contra el catálogo
+        // real (GrupoSanguineoSeeder) en vez de hardcodear IDs, que es lo
+        // que dejaba a la mayoría de los pacientes con un id=1 "a ciegas"
+        // sin grupo sanguíneo real asociado.
+        $gruposPorCodigo = GrupoSanguineo::whereIn('codigo', ['A+', 'O+', 'O-', 'B+', 'AB-'])
+            ->get()
+            ->keyBy('codigo');
+
+        $grupoAPositivo = $gruposPorCodigo->get('A+') ?? GrupoSanguineo::firstOrCreate(
             ['codigo' => 'A+'],
             [
                 'nombre'       => 'A Positivo',
@@ -32,8 +39,8 @@ class PersonaSeeder extends Seeder
             ]
         );
 
-        // ── Pacientes de prueba (todos pediátricos, área de Pediatría) ─
-        // Edades variadas a propósito: desde lactantes hasta preadolescentes,
+        // ── Pacientes de prueba
+        // Edades variadas a propósito
         // para poder probar el Resumen con historias cortas y largas.
         $pacientes = [
             [
@@ -43,6 +50,7 @@ class PersonaSeeder extends Seeder
                 'sexo' => 'M',
                 'genero' => 'M',
                 'fecha_nacimiento' => now()->subYears(3)->subMonths(2)->toDateString(),
+                'grupo_sanguineo_id' => $gruposPorCodigo->get('O+')?->id ?? $grupoAPositivo->id,
             ],
             [
                 'nombres' => 'María',
@@ -51,6 +59,7 @@ class PersonaSeeder extends Seeder
                 'sexo' => 'F',
                 'genero' => 'F',
                 'fecha_nacimiento' => now()->subMonths(9)->toDateString(),
+                'grupo_sanguineo_id' => $gruposPorCodigo->get('O-')?->id ?? $grupoAPositivo->id,
             ],
             [
                 'nombres' => 'Carlos',
@@ -71,6 +80,7 @@ class PersonaSeeder extends Seeder
                 'sexo' => 'F',
                 'genero' => 'F',
                 'fecha_nacimiento' => now()->subYears(7)->subMonths(4)->toDateString(),
+                'grupo_sanguineo_id' => $gruposPorCodigo->get('B+')?->id ?? $grupoAPositivo->id,
             ],
             [
                 'nombres' => 'Ramón',
@@ -79,6 +89,7 @@ class PersonaSeeder extends Seeder
                 'sexo' => 'M',
                 'genero' => 'M',
                 'fecha_nacimiento' => now()->subYears(11)->subMonths(6)->toDateString(),
+                'grupo_sanguineo_id' => $gruposPorCodigo->get('AB-')?->id ?? $grupoAPositivo->id,
             ],
         ];
 

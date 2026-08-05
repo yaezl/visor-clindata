@@ -230,8 +230,22 @@
 }
 
 .patient-summary-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    border-left: 3px solid var(--hu-primary);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
     font-size: .92rem;
     color: var(--hu-text);
+}
+
+.patient-summary-intro i {
+    color: var(--hu-primary);
+    font-size: 1.1rem;
+    margin-top: 1px;
 }
 
 .patient-summary-pattern {
@@ -326,6 +340,63 @@
 .patient-summary-list--antecedente li:last-child {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+/* Chips de antecedentes perinatales: grilla de tarjetas label/valor */
+.patient-summary-chip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.patient-summary-chip {
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    border-radius: var(--border-radius);
+    padding: 10px 14px;
+}
+
+.patient-summary-chip-label {
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--hu-text-secondary);
+    margin-bottom: 4px;
+}
+
+.patient-summary-chip-value {
+    display: block;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.patient-summary-chip-value small {
+    font-size: .74rem;
+    font-weight: 500;
+    color: var(--hu-text-secondary);
+}
+
+/* Medicación activa: nombre + dosis en la misma fila con jerarquía
+   visual (dosis como badge), fecha de inicio debajo. */
+.patient-summary-med-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.patient-summary-med-dosis {
+    flex-shrink: 0;
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    color: var(--hu-primary);
+    font-size: .74rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 10px;
 }
 
 .patient-summary-badge {

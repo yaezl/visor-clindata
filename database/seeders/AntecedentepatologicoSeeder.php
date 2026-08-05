@@ -59,12 +59,6 @@ class AntecedentepatologicoSeeder extends Seeder
                         'comentario' => $antecedente['comentario'],
                         'personal_id' => $personalId,
                         'creado_en' => now(),
-                        // La columna 'borrado_en' es NOT NULL en la tabla
-                        // legacy 'antecedentepatologico' (a diferencia de
-                        // 'antecedenteperinatal', donde sí admite NULL), así
-                        // que hay que mandar un valor explícito. No implica
-                        // que el registro esté borrado: el borrado lógico
-                        // real se controla aparte, si el modelo lo usa.
                         'borrado_en' => now(),
                         'creadopor_id' => $personalId,
                         'modificadopor_id' => $personalId,

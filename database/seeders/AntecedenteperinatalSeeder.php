@@ -11,11 +11,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Carga un antecedente perinatal por cada paciente pediátrico de
- * PersonaSeeder. Los datos están pensados para reflejar la misma
- * variedad clínica que se ve en el PDF real del hospital (ej: María
- * Gómez nace pretérmino y PAEG, como la paciente del "resumen_ia"),
- * y para poder probar el bloque "Antecedentes perinatales" con casos
- * sanos y con antecedentes relevantes.
+ * PersonaSeeder.
  *
  * Solo pacientes: se apoya en la misma lista de documentos de
  * personal médico que EventohcSeeder, para no crear antecedentes
@@ -74,7 +70,7 @@ class AntecedenteperinatalSeeder extends Seeder
             '12345678' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
-                    'tipo_parto' => 'Vaginal',
+                    'tipo_parto' => 'Normal',
                     'peso_al_nacer' => 3.2,
                     'edad_gestacional' => 39,
                     'talla' => 50,
@@ -90,8 +86,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // María Gómez (9 meses) — pretérmino tardía PAEG por HTA
-            // materna, igual que la paciente del resumen_ia de referencia.
+            // María Gómez (9 meses)
             '87654321' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
@@ -100,13 +95,13 @@ class AntecedenteperinatalSeeder extends Seeder
                     'edad_gestacional' => 36,
                     'talla' => 44,
                     'perimetro_cefalico' => 31,
-                    'sano' => false,
+                    'sano' => true,
                     'con_patologia' => true,
                     'deprimido' => false,
                     'reanimacion' => false,
                     'apgar_1' => 8,
                     'apgar_5' => 9,
-                    'comentario' => 'Pretérmino tardía (36 semanas), parto indicado por hipertensión materna. Pequeña para la edad gestacional (PAEG).',
+                    'comentario' => 'Pretérmino tardía, parto indicado por hipertensión materna. Pequeña para la edad gestacional (PAEG).',
                     'pesquisa_neonatal' => 'Normal',
                 ],
             ],
@@ -115,7 +110,7 @@ class AntecedenteperinatalSeeder extends Seeder
             '67245356' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
-                    'tipo_parto' => 'Vaginal',
+                    'tipo_parto' => 'Normal',
                     'peso_al_nacer' => 3.4,
                     'edad_gestacional' => 39,
                     'talla' => 51,
@@ -135,7 +130,7 @@ class AntecedenteperinatalSeeder extends Seeder
             '41555666' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
-                    'tipo_parto' => 'Vaginal',
+                    'tipo_parto' => 'Normal',
                     'peso_al_nacer' => 3.1,
                     'edad_gestacional' => 38,
                     'talla' => 49,
