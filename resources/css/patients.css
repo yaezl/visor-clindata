@@ -20,8 +20,8 @@
     pointer-events: none;
 }
 
-#searchInput {
-    padding-left: 44px;
+#searchInput, .search-input {
+    padding-left: 48px !important;
     border-radius: 16px;
     background: var(--hu-surface);
     border: 1px solid var(--hu-border);

@@ -1,0 +1,433 @@
+/* ==========================================================
+   HISTORIA CLÍNICA
+========================================================== */
+
+.patient-history{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+/* ==========================================================
+   BARRA DE BÚSQUEDA
+   (Reutiliza search-form del proyecto)
+========================================================== */
+
+.search-form{
+    margin-bottom:8px;
+}
+
+.search-form .form-select{
+
+    width:180px;
+
+    height:48px;
+
+    border-radius:16px;
+
+    border:1px solid var(--hu-border);
+
+    background:var(--hu-surface);
+
+    font-size:.95rem;
+
+}
+
+.search-form .form-select:focus{
+
+    border-color:var(--hu-primary);
+
+    box-shadow:0 0 0 .15rem rgba(0,55,100,.12);
+
+}
+
+/* ==========================================================
+   MESES
+========================================================== */
+
+.history-month{
+    margin-top:20px;
+}
+
+.history-month:first-child{
+    margin-top:0;
+}
+
+.history-month-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    margin-bottom:14px;
+
+}
+
+.history-month-title h5{
+
+    margin:0;
+
+    font-size:.85rem;
+
+    font-weight:700;
+
+    color:var(--hu-text-secondary);
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+}
+
+.history-month-title::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:var(--hu-border);
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.history-card{
+
+    background:var(--hu-surface);
+
+    border-radius:var(--border-radius);
+
+    border:1px solid var(--hu-border);
+
+    box-shadow:var(--shadow-card);
+
+    overflow:hidden;
+
+    margin-bottom:14px;
+
+}
+
+.history-card .accordion-item{
+
+    border:none;
+
+    background:none;
+
+}
+
+.history-card .accordion-button{
+
+    padding:18px 22px;
+
+    background:transparent;
+
+    box-shadow:none;
+
+}
+
+.history-card .accordion-button:not(.collapsed){
+
+    background:transparent;
+
+    color:inherit;
+
+}
+
+.history-card .accordion-button::after{
+
+    opacity:.6;
+
+    transform:scale(.8);
+
+}
+
+/* ==========================================================
+   HEADER CARD
+========================================================== */
+
+.history-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:24px;
+
+}
+
+.history-left{
+
+    flex:1;
+
+}
+
+.history-right{
+
+    text-align:right;
+
+    flex-shrink:0;
+
+}
+
+.history-type{
+
+    font-size:.72rem;
+
+    font-weight:700;
+
+    color:var(--hu-primary);
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+    margin-bottom:4px;
+
+}
+
+.history-title{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    color:var(--hu-text);
+
+    margin-bottom:4px;
+
+}
+
+.history-doctor{
+
+    font-size:.88rem;
+
+    color:var(--hu-text-secondary);
+
+}
+
+.history-date{
+
+    font-size:.82rem;
+
+    color:var(--hu-text-secondary);
+
+}
+
+.history-hour{
+
+    font-size:.76rem;
+
+    color:var(--hu-text-secondary);
+
+}
+
+/* Ocultamos los chips de la tarjeta */
+
+.history-tags{
+
+    display:none;
+
+}
+
+/* ==========================================================
+   DETALLE
+========================================================== */
+
+.history-detail{
+
+    padding:20px 22px;
+
+    border-top:1px solid var(--hu-border);
+
+}
+
+.detail-section{
+
+    padding:16px 0;
+
+    border-bottom:1px solid #EEF2F6;
+
+}
+
+.detail-section:last-child{
+
+    border-bottom:none;
+
+}
+
+.detail-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-bottom:8px;
+
+    font-size:.78rem;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.06em;
+
+    color:var(--hu-primary);
+
+}
+
+.detail-title .material-symbols-outlined{
+
+    font-size:18px;
+
+}
+
+.detail-content{
+
+    font-size:.9rem;
+
+    line-height:1.45;
+
+    color:var(--hu-text);
+
+    white-space:pre-line;
+
+}
+
+/* ==========================================================
+   DIAGNÓSTICOS
+========================================================== */
+
+.diagnosis-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.diagnosis-item{
+
+    position:relative;
+
+    padding-left:14px;
+
+    font-size:.9rem;
+
+    color:var(--hu-text);
+
+}
+
+.diagnosis-item::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:9px;
+
+    width:5px;
+
+    height:5px;
+
+    border-radius:50%;
+
+    background:var(--hu-primary);
+
+}
+
+/* ==========================================================
+   ESTUDIOS
+========================================================== */
+
+.study-table{
+
+    border:1px solid var(--hu-border);
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+}
+
+.study-table table{
+
+    margin:0;
+
+}
+
+.study-table th{
+
+    background:#F8FAFC;
+
+    font-size:.75rem;
+
+    color:var(--hu-text-secondary);
+
+    text-transform:uppercase;
+
+    border:none;
+
+}
+
+.study-table td{
+
+    font-size:.88rem;
+
+    vertical-align:middle;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+    .history-row{
+
+        flex-direction:column;
+
+        gap:10px;
+
+    }
+
+    .history-right{
+
+        text-align:left;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .search-form{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+    .search-form .form-select{
+
+        width:100%;
+
+    }
+
+}
+

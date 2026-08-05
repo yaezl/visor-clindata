@@ -1,132 +1,80 @@
-<!DOCTYPE html>
-<html lang="es">
+<x-app-layout>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div class="patient-history">
 
-    <title>
-        Historial Clínico -
-        {{ $persona->nombres }}
-        {{ $persona->apellidos }}
-    </title>
+        @include('patients.partials.patient-header')
 
-    {{-- Bootstrap --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        @include('patients.partials.search-bar')
 
-    {{-- Montserrat --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        @if($historial->count())
 
-    {{-- Google Icons --}}
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+            @include('patients.partials.history-group')
 
-    <style>
+        @else
 
-        :root{
-            --primary:#003764;
-            --secondary:#C7A36E;
-            --text:#59595B;
-            --background:#F7F9FB;
-            --border:#E5E7EB;
-        }
+            @include('patients.partials.empty-state')
 
-        body{
-            background:var(--background);
-            font-family:'Montserrat',sans-serif;
-            color:var(--text);
-        }
+        @endif
 
-        .page-container{
-            max-width:1300px;
-            margin:auto;
-            padding:40px 20px;
-        }
+    </div>
 
-    </style>
+    <script>
 
-</head>
+        document.addEventListener("DOMContentLoaded", () => {
 
-<body>
+            const buscador = document.getElementById("buscarHistorial");
+            const filtro = document.getElementById("tipoFiltro");
 
-<div class="page-container">
+            if (!buscador || !filtro) return;
 
-    {{-- Cabecera paciente --}}
-    @include('patients.partials.patient-header')
+            const filtrar = () => {
 
-    {{-- Barra buscador --}}
-    @include('patients.partials.search-bar')
+                const texto = buscador.value.toLowerCase().trim();
 
-    {{-- Historial --}}
-    @if($historial->count())
+                const tipo = filtro.value.toLowerCase();
 
-        @include('patients.partials.history-group')
+                document.querySelectorAll(".historial-item").forEach(item => {
 
-    @else
+                    const contenido = (item.dataset.texto || "").toLowerCase();
 
-        @include('patients.partials.empty-state')
+                    const tipoItem = (item.dataset.tipo || "").toLowerCase();
 
-    @endif
+                    const coincideTexto =
+                        texto === "" ||
+                        contenido.includes(texto);
 
-</div>
+                    const coincideTipo =
+                        tipo === "" ||
+                        tipoItem.includes(tipo);
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+                    item.style.display =
+                        coincideTexto && coincideTipo
+                            ? ""
+                            : "none";
 
-    const buscador = document.getElementById("buscarHistorial");
-    const filtro = document.getElementById("tipoFiltro");
+                });
 
-    const filtrar = () => {
+                document.querySelectorAll(".historial-mes").forEach(mes => {
 
-        const texto = buscador.value.toLowerCase().trim();
-        const tipo = filtro.value.toLowerCase();
+                    const visibles = mes.querySelectorAll(
+                        ".historial-item:not([style*='display: none'])"
+                    );
 
-        // Recorremos todos los eventos
-        document.querySelectorAll(".historial-item").forEach(item => {
+                    mes.style.display =
+                        visibles.length
+                            ? ""
+                            : "none";
 
-            const contenido = (item.dataset.texto || "").toLowerCase();
-            const tipoItem = (item.dataset.tipo || "").toLowerCase();
+                });
 
-            const coincideTexto =
-                texto === "" || contenido.includes(texto);
+            };
 
-            const coincideTipo =
-                tipo === "" || tipoItem.includes(tipo);
+            buscador.addEventListener("input", filtrar);
 
-            item.style.display =
-                coincideTexto && coincideTipo
-                    ? ""
-                    : "none";
+            filtro.addEventListener("change", filtrar);
 
         });
 
-        // Mostrar u ocultar cada mes según tenga eventos visibles
-        document.querySelectorAll(".historial-mes").forEach(mes => {
+    </script>
 
-            const visibles = mes.querySelectorAll(
-                ".historial-item:not([style*='display: none'])"
-            );
-
-            mes.style.display =
-                visibles.length > 0
-                    ? ""
-                    : "none";
-
-        });
-
-    };
-
-    buscador.addEventListener("input", filtrar);
-
-    filtro.addEventListener("change", filtrar);
-
-});
-
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+</x-app-layout>
