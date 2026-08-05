@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             PersonalSeeder::class,      // Crea Dra. Fernández (Persona+Personal) + Usuario legacy "sistema"
             GrupoSanguineoSeeder::class, // Usa el Usuario recién creado
             PersonaSeeder::class,        // Usa el Usuario recién creado + grupo_sanguineo
-            TurnoProgramadoSeeder::class, 
+            TurnoProgramadoSeeder::class,
             DiagnosticoSeeder::class,
             AntecedenteperinatalSeeder::class, // Usa Persona + Diagnostico
             AntecedentepatologicoSeeder::class, // Usa Persona + Diagnostico
@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
             DiagnosticoDetalleSeeder::class,
             AlergiaSeeder::class,
             MedicacionSeeder::class,
+            MedicionesAntropometricasSeeder::class,
+            PediatriaOmsSeeder::class,
         ]);
     }
 }

@@ -1,0 +1,480 @@
+/* ═══════════════════════════════════════════════════════════════ crecimiento.css — Panel de Control de Crecimiento Usa las variables del sistema definidas en variables.css ═══════════════════════════════════════════════════════════════ */
+/* ── Wrapper principal ──────────────────────────────────────── */
+.crec-panel {
+    padding: 4px 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── Estado vacío ───────────────────────────────────────────── */
+.crec-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 24px;
+    color: var(--hu-text-secondary);
+    text-align: center;
+}
+
+.crec-empty-icon {
+    font-size: 2rem;
+    color: var(--hu-border);
+}
+
+.crec-empty-sub {
+    font-size: .85rem;
+    color: var(--hu-text-secondary);
+    margin: 0;
+}
+
+/* ── Títulos de sección ─────────────────────────────────────── */
+.crec-seccion-titulo {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--hu-text-secondary);
+    text-transform: uppercase;
+    margin: 0 0 10px;
+}
+
+/* ── Bloque de estado general ───────────────────────────────── */
+.crec-estado {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--hu-background);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+
+.crec-estado-badge {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.crec-estado-badge--ok {
+    background: #D4EDDA;
+    color: var(--hu-success);
+}
+
+.crec-estado-badge--alerta {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.crec-estado-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.crec-estado-fecha {
+    font-size: .82rem;
+    color: var(--hu-text-secondary);
+    margin: 0;
+}
+
+.crec-estado-label {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--hu-text);
+    margin: 0;
+}
+
+.crec-estado-sub {
+    font-size: .82rem;
+    color: var(--hu-text-secondary);
+    margin: 0;
+}
+
+/* ── Chips de medición actual ───────────────────────────────── */
+.crec-chips-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .crec-chips-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .crec-chips-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.crec-chip {
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.crec-chip--noaplica {
+    opacity: .75;
+}
+
+.crec-chip-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    color: var(--hu-text-secondary);
+    font-weight: 500;
+}
+
+.crec-chip-header i {
+    font-size: .95rem;
+    color: var(--hu-primary);
+}
+
+.crec-chip-valor {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--hu-text);
+    margin: 4px 0 0;
+    line-height: 1.1;
+}
+
+.crec-chip-valor small {
+    font-size: .8rem;
+    font-weight: 400;
+    color: var(--hu-text-secondary);
+}
+
+.crec-chip-valor--nd {
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--hu-text-secondary);
+}
+
+/* ── Barra de percentil ─────────────────────────────────────── */
+.crec-barra-wrap {
+    height: 6px;
+    background: var(--hu-border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.crec-barra-fill {
+    height: 100%;
+    background: var(--hu-primary);
+    border-radius: 999px;
+    transition: width .4s ease;
+}
+
+.crec-barra-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: .65rem;
+    color: var(--hu-text-secondary);
+    margin-top: 2px;
+}
+
+.crec-barra-labels--sm {
+    margin-bottom: 8px;
+}
+
+/* ── Fila evolución + tabla ─────────────────────────────────── */
+.crec-evolucion-row {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 320px;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .crec-evolucion-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Gráfico ────────────────────────────────────────────────── */
+.crec-grafico-wrap {
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    border-radius: 12px;
+    padding: 16px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.crec-canvas-wrap {
+    height: 220px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.crec-oms-nota {
+    font-size: .72rem;
+    color: var(--hu-text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── Tabs del gráfico ───────────────────────────────────────── */
+.crec-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.crec-tab {
+    background: transparent;
+    border: 1px solid var(--hu-border);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--hu-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.crec-tab:hover {
+    border-color: var(--hu-primary);
+    color: var(--hu-primary);
+}
+
+.crec-tab--active {
+    background: var(--hu-primary);
+    border-color: var(--hu-primary);
+    color: #fff;
+}
+
+/* ── Tabla de controles ─────────────────────────────────────── */
+.crec-tabla-wrap {
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    border-radius: 12px;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+.crec-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+}
+
+.crec-tabla th {
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--hu-text-secondary);
+    text-align: left;
+    padding: 0 8px 8px;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.crec-tabla td {
+    padding: 8px;
+    color: var(--hu-text);
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.crec-tabla tr:last-child td {
+    border-bottom: none;
+}
+
+.crec-ver-mas {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid var(--hu-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: .78rem;
+    color: var(--hu-primary);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-weight: 500;
+}
+
+.crec-ver-mas:hover {
+    background: var(--hu-background);
+}
+
+/* ── Fila inferior: percentiles + alertas ───────────────────── */
+.crec-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 640px) {
+    .crec-bottom-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Panel de percentiles ───────────────────────────────────── */
+.crec-percentiles-panel {
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.crec-perc-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.crec-perc-label {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.crec-perc-valor {
+    font-size: .75rem;
+    color: var(--hu-text-secondary);
+}
+
+.crec-interpretacion {
+    margin-top: 12px;
+    background: #D4EDDA;
+    color: var(--hu-success);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: .8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Panel de alertas ───────────────────────────────────────── */
+.crec-alertas-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.crec-alerta {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: .8rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.crec-alerta--success {
+    background: #F0FBF4;
+    color: var(--hu-success);
+    border: 1px solid #C3E6CB;
+}
+
+.crec-alerta--warning {
+    background: #FFFBF0;
+    color: #856404;
+    border: 1px solid #FFE08A;
+}
+
+.crec-alerta--danger {
+    background: #FFF0F0;
+    color: var(--hu-danger);
+    border: 1px solid #F5C6CB;
+}
+
+/* ── Próximo control ────────────────────────────────────────── */
+.crec-proximo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #003764 0%, #0b4c84 100%);
+    border-radius: 14px;
+    padding: 16px 20px;
+    color: #fff;
+}
+
+.crec-proximo-icono {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.crec-proximo-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.crec-proximo-label {
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    opacity: .75;
+}
+
+.crec-proximo-valor {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.crec-proximo-sub {
+    font-size: .75rem;
+    opacity: .75;
+}
+
+.crec-proximo-fecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, .1);
+    border-radius: 10px;
+    padding: 8px 14px;
+    min-width: 54px;
+    text-align: center;
+}
+
+.crec-proximo-mes {
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--hu-secondary);
+}
+
+.crec-proximo-dia {
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.crec-proximo-anio {
+    font-size: .7rem;
+    opacity: .8;
+}

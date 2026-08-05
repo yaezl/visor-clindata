@@ -7,6 +7,7 @@ use App\Services\EventohcService;
 use App\Services\PatientSummaryService;
 use App\Services\AntecedenteService;
 use App\Services\VacunacionService;
+use App\Services\CrecimientoService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -20,6 +21,7 @@ class PersonaController extends Controller
         protected PatientSummaryService $patientSummaryService,
         protected AntecedenteService $antecedenteService,
         protected VacunacionService $vacunacionService, 
+        protected CrecimientoService $crecimientoService,
     ) {
     }
 
@@ -73,6 +75,7 @@ class PersonaController extends Controller
         $datos['resumen_clinico'] = $this->patientSummaryService->resumenDe($datos['persona']);
         $datos['antecedentes'] = $this->antecedenteService->antecedentesDe($datos['persona']);
         $datos['vacunacion']      = $this->vacunacionService->calcularParaPaciente($datos['persona']);
+        $datos['crecimiento'] = $this->crecimientoService->calcularParaPaciente($datos['persona']);
 
         return view('patients.detail', $datos);
     }
