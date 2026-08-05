@@ -102,9 +102,7 @@ class PersonaService
 
             'iniciales' => $this->iniciales($persona),
 
-            'edad' => $persona->fecha_nacimiento
-                ? $persona->fecha_nacimiento->age
-                : null,
+            'edad' => $this->edadFormateada($persona->fecha_nacimiento),
 
             'grupo_sanguineo' => $persona->grupo_sanguineo?->codigo,
 
@@ -124,6 +122,34 @@ class PersonaService
             'medicaciones_activas' => $persona->medicaciones,
             'tiene_medicacion_activa' => $persona->medicaciones->isNotEmpty(),
         ];
+    }
+
+   /**
+     * Para bebés (menores de 1 año) mostrar la edad en años redondea
+     * a "0 años", que no dice nada útil al médico. Mostramos en meses
+     * hasta que cumplan el año, y en años a partir de ahí.
+     */
+    protected function edadFormateada(?\Illuminate\Support\Carbon $fechaNacimiento): ?string
+    {
+        if (!$fechaNacimiento) {
+            return null;
+        }
+
+        $anios = (int) floor($fechaNacimiento->age);
+
+        if ($anios >= 1) {
+            return "{$anios} " . ($anios === 1 ? 'año' : 'años');
+        }
+
+        $meses = (int) floor($fechaNacimiento->diffInMonths(now()));
+
+        if ($meses < 1) {
+            $dias = (int) floor($fechaNacimiento->diffInDays(now()));
+
+            return "{$dias} " . ($dias === 1 ? 'día' : 'días');
+        }
+
+        return "{$meses} " . ($meses === 1 ? 'mes' : 'meses');
     }
 
     protected function iniciales(Persona $persona): string

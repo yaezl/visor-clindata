@@ -593,6 +593,15 @@ class Persona extends Model
 			return $this->nombre_alias;
 		}
 
-		return trim("{$this->nombres} {$this->apellidos} {$this->apellido_materno}");
+		// Datos legacy: algunos registros guardan apellido_materno como
+		// '-' en vez de vacío/null cuando no hay dato, y eso queda
+		// pegado al nombre.Lo tratamos como vacío.
+		$apellidoMaterno = trim((string) $this->apellido_materno);
+
+		if ($apellidoMaterno === '-') {
+			$apellidoMaterno = '';
+		}
+
+		return trim("{$this->nombres} {$this->apellidos} {$apellidoMaterno}");
 	}
 }

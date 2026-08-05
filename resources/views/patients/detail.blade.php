@@ -10,10 +10,16 @@
 --}}
 
 @php
-    // Resumen generado por plantilla (sin IA): concatenación de datos reales.
-    $resumen = "Paciente de {$edad} años en seguimiento regular. "
-        . "Presenta {$alergias_count} " . ($alergias_count === 1 ? 'alergia registrada' : 'alergias registradas')
-        . ($tiene_medicacion_activa ? " y medicación activa." : " y sin medicación activa.");
+    // Resumen generado por plantilla:  concatenación de datos reales.
+    $nombresAlergias = $alergias->pluck('nombre');
+
+    $fraseAlergias = $nombresAlergias->isNotEmpty()
+        ? "Alérgico a {$nombresAlergias->implode(', ')}. "
+        : '';
+
+    $resumen = "Paciente de {$edad} en seguimiento regular. "
+        . $fraseAlergias
+        . ($tiene_medicacion_activa ? "Con medicación activa." : "Sin medicación activa.");
 
     // Cada acordeón: id, icono, título y el partial que renderiza su contenido.
     $acordeones = [
@@ -67,7 +73,7 @@
                     <h2 class="patient-detail-name">{{ $persona->nombre_completo }}</h2>
 
                     <div class="patient-detail-meta">
-                        <span>{{ $edad ?? '—' }} años</span>
+                        <span>{{ $edad ?? '—' }}</span>
                         <span class="dot"></span>
                         <span>{{ $persona->sexo === 'M' ? 'Masculino' : ($persona->sexo === 'F' ? 'Femenino' : ($persona->sexo ?? '—')) }}</span>
                         <span class="dot"></span>
