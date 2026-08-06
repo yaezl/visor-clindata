@@ -36,6 +36,7 @@ $diagnosticoPrincipal = $diagnosticos->first()?->diagnostico?->nombre
         {{ strtolower($detalle?->sintomas_signos ?? '') }}
         {{ strtolower($detalle?->funciones_biologicas ?? '') }}
         {{ strtolower($detalle?->cremiento_desarrollo ?? '') }}
+        {{ strtolower(trim(($medico->nombres ?? '').' '.($medico->apellidos ?? ''))) }}
         {{ optional($evento->fechahora)->format('d/m/Y') }}
     "
     id="accordion-{{ $evento->id }}">

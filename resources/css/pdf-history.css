@@ -46,11 +46,11 @@ body{
 /* ---------- Datos paciente ---------- */
 
 .patient-info{
-    border:1px solid #d9d9d9;
-    border-radius:6px;
-    background:#fafafa;
-    padding:14px 18px;
-    margin-bottom:20px;
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-radius:10px;
+    padding:16px 20px;
+    margin-bottom:24px;
 }
 
 .patient-grid{
@@ -65,17 +65,19 @@ body{
 }
 
 .patient-label{
-    font-size:10px;
-    font-weight:bold;
-    color:#666;
+    font-size:9px;
+    font-weight:700;
+    color:#64748B;
+    font-family: Arial, Helvetica, sans-serif;
     text-transform:uppercase;
+    letter-spacing:.18em;
     margin-bottom:4px;
 }
 
 .patient-value{
-    font-size:14px;
-    color:#222;
+    font-size:16px;
     font-weight:600;
+    color:#1E293B;
 }
 
 /* ---------- Historial ---------- */
