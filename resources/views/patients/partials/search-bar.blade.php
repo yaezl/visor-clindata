@@ -21,17 +21,16 @@
 
     </div>
 
-        <button
-            type="button"
-            class="btn-detail-history"
-            disabled>
+    <a href="{{ route('patients.export-pdf', $persona->id) }}"
+        class="btn-detail-history"
+        title="Exportar historial médico a PDF">
 
-            <span class="material-symbols-outlined">
-                picture_as_pdf
-            </span>
+        <span class="material-symbols-outlined">
+            picture_as_pdf
+        </span>
 
-            Exportar PDF
+        Exportar PDF
 
-        </button>
+    </a>
 
 </div>

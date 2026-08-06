@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PersonaController extends Controller
 {
@@ -80,4 +81,33 @@ class PersonaController extends Controller
 
         return view('patients.detail', $datos);
     }
+
+ /**
+     * Exportar historial médico a PDF
+     * Solo muestra iniciales del nombre y apellido, sexo, fecha de nacimiento y edad
+     */
+    public function exportHistorialPDF(int $id)
+    {
+        $persona = $this->personaService->buscar($id);
+        $historial = $this->eventohcService->historial($id);
+ 
+        // Calcular iniciales
+        $inicialNombre = strtoupper(substr($persona->nombres, 0, 1));
+        $inicialApellido = strtoupper(substr($persona->apellidos, 0, 1));
+ 
+        $data = [
+            'persona' => $persona,
+            'historial' => $historial,
+            'inicialNombre' => $inicialNombre,
+            'inicialApellido' => $inicialApellido,
+            'fecha_impresion' => now()->format('d/m/Y H:i'),
+        ];
+ 
+        $pdf = Pdf::loadView('patients.partials.historial-pdf', $data);
+        
+        $nombreArchivo = "Historial_".$inicialNombre.$inicialApellido."_".now()->format('d-m-Y').".pdf";
+        
+        return $pdf->download($nombreArchivo);
+    }
 }
+ 

@@ -45,6 +45,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/urgentes', [InformedeestudioController::class, 'urgentes'])->name('urgentes');
     });
     Route::resource('informes-de-estudio', InformedeestudioController::class)->only(['index', 'show']);
+    Route::get('/{id}/export-pdf', [PersonaController::class, 'exportHistorialPDF'])->name('patients.export-pdf');
+
 });
 
 require __DIR__ . '/auth.php';
