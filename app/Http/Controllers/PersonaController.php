@@ -103,7 +103,7 @@ class PersonaController extends Controller
             'fecha_impresion' => now()->format('d/m/Y H:i'),
         ];
  
-        $pdf = Pdf::loadView('patients.partials.historial-pdf', $data);
+        $pdf = Pdf::loadView('patients.partials.pdf-history', $data);
         
         $nombreArchivo = "Historial_".$inicialNombre.$inicialApellido."_".now()->format('d-m-Y').".pdf";
         
