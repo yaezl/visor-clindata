@@ -1,0 +1,441 @@
+/* ── Botón volver ───────────────────────────────── */
+.patient-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hu-text-secondary);
+    font-weight: 500;
+    font-size: .9rem;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+}
+
+.patient-back-link:hover {
+    color: var(--hu-primary);
+}
+
+/* ── Header de paciente ─────────────────────────── */
+.patient-detail-header {
+    background: var(--hu-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+}
+
+.patient-detail-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.patient-detail-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.patient-detail-avatar {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #D8E6F7, #EAF1FB);
+    color: var(--hu-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hu-border);
+}
+
+.patient-detail-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--hu-text);
+    margin: 0 0 4px;
+}
+
+.patient-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: .87rem;
+    color: var(--hu-text-secondary);
+}
+
+.patient-detail-meta .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--hu-text-secondary);
+    display: inline-block;
+}
+
+.blood-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #FDEBEC;
+    color: #C0392B;
+    font-weight: 700;
+    font-size: .76rem;
+}
+
+/* ── Botón "Historia Clínica" (header) ───────────── */
+.btn-detail-history {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--hu-primary);
+    background: var(--hu-primary);
+    color: var(--hu-surface);
+    font-weight: 600;
+    padding: 10px 22px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: .88rem;
+}
+
+.btn-detail-history:hover {
+    background: var(--hu-primary-hover);
+    border-color: var(--hu-primary-hover);
+    color: var(--hu-surface);
+}
+
+.btn-detail-history i {
+    font-size: 1rem;
+}
+
+/* ── Fila de info clínica extra (bajo la identidad) ──────────── */
+.patient-detail-info-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hu-border);
+}
+
+.patient-info-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.patient-info-chip-label {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--hu-text-secondary);
+}
+
+.patient-info-chip-value {
+    font-size: .89rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.patient-info-chip-value.text-danger {
+    color: #C0392B;
+}
+
+.patient-info-chip-sub {
+    font-size: .76rem;
+    color: var(--hu-text-secondary);
+    font-weight: 400;
+}
+
+.patient-tab-empty {
+    color: var(--hu-text-secondary);
+    font-size: .88rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.patient-tab-empty::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--hu-border);
+    display: inline-block;
+}
+
+/* ── Resumen: botón acordeón (distinto de los otros 3 tabs) ── */
+.patient-summary-toggle {
+    background: var(--hu-primary);
+    border: 2px solid var(--hu-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--hu-surface);
+    font-weight: 600;
+    font-size: .88rem;
+    width: 100%;
+}
+
+.patient-summary-toggle:hover {
+    background: var(--hu-primary-hover);
+    border-color: var(--hu-primary-hover);
+}
+
+.patient-summary-toggle.active {
+    border-color: var(--hu-secondary);
+    box-shadow: 0 0 0 3px rgba(199, 163, 110, .35), 0 6px 16px rgba(0, 55, 100, .22);
+}
+
+.patient-summary-toggle .bi-chevron-down {
+    transition: var(--transition);
+    margin-left: auto;
+}
+
+.patient-summary-toggle.active .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+.patient-summary-panel {
+    background: var(--hu-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    margin-top: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .3s ease, opacity .25s ease, padding .3s ease;
+    padding: 0 28px;
+}
+
+.patient-summary-panel.open {
+    max-height: 2000px;
+    opacity: 1;
+    padding: 26px 28px;
+}
+
+.patient-summary-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    border-left: 3px solid var(--hu-primary);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
+    font-size: .92rem;
+    color: var(--hu-text);
+}
+
+.patient-summary-intro i {
+    color: var(--hu-primary);
+    font-size: 1.1rem;
+    margin-top: 1px;
+}
+
+.patient-summary-pattern {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(199, 163, 110, .12);
+    border: 1px solid var(--hu-secondary);
+    border-radius: var(--border-radius);
+    padding: 12px 14px;
+    font-size: .88rem;
+    color: var(--hu-text);
+    margin-bottom: 20px;
+}
+
+.patient-summary-pattern i {
+    color: var(--hu-secondary);
+    font-size: 1.1rem;
+    margin-top: 1px;
+}
+
+.patient-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.patient-summary-block h5 {
+    font-size: .74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--hu-primary);
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.patient-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.patient-summary-content p {
+    font-size: .92rem;
+    color: var(--hu-text);
+}
+
+.patient-summary-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: .88rem;
+    color: var(--hu-text);
+}
+
+/* Listas donde cada ítem lleva un texto largo apilado debajo del
+   nombre (antecedentes patológicos, medicación): en vez de una fila
+   nombre+badge, cada <li> pasa a columna. */
+.patient-summary-list--antecedente li,
+.patient-summary-list-item--stacked {
+    display: block;
+}
+
+.patient-summary-med-nombre {
+    font-weight: 600;
+    color: var(--hu-text);
+    font-size: .88rem;
+}
+
+.patient-summary-med-detalle {
+    font-size: .8rem;
+    color: var(--hu-text-secondary);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.patient-summary-list--medicacion li,
+.patient-summary-list--antecedente li {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.patient-summary-list--medicacion li:last-child,
+.patient-summary-list--antecedente li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Chips de antecedentes perinatales: grilla de tarjetas label/valor */
+.patient-summary-chip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.patient-summary-chip {
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    border-radius: var(--border-radius);
+    padding: 10px 14px;
+}
+
+.patient-summary-chip-label {
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--hu-text-secondary);
+    margin-bottom: 4px;
+}
+
+.patient-summary-chip-value {
+    display: block;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.patient-summary-chip-value small {
+    font-size: .74rem;
+    font-weight: 500;
+    color: var(--hu-text-secondary);
+}
+
+/* Medicación activa: nombre + dosis en la misma fila con jerarquía
+   visual (dosis como badge), fecha de inicio debajo. */
+.patient-summary-med-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.patient-summary-med-dosis {
+    flex-shrink: 0;
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    color: var(--hu-primary);
+    font-size: .74rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+
+.patient-summary-badge {
+    background: var(--hu-primary);
+    color: var(--hu-surface);
+    font-size: .74rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 9px;
+    flex-shrink: 0;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 992px) {
+    .patient-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-detail-info-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .patient-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .patient-detail-info-row {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-detail-header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-detail-history {
+        justify-content: center;
+    }
+}

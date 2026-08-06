@@ -1,0 +1,398 @@
+/* ══════════════════════════════════════════════════
+   Dashboard Header
+   ══════════════════════════════════════════════════ */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--hu-text);
+    margin: 0;
+}
+
+.dashboard-subtitle {
+    margin: 4px 0 0;
+    font-size: .9rem;
+    color: var(--hu-text-secondary);
+}
+
+/* Reloj en tiempo real */
+.dashboard-time {
+    font-weight: 600;
+    color: var(--hu-primary);
+}
+
+.btn-calendar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--hu-border);
+    color: var(--hu-text);
+    font-weight: 500;
+    padding: 8px 20px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.btn-calendar:hover {
+    background: var(--hu-background);
+    border-color: var(--hu-primary);
+    color: var(--hu-primary);
+}
+
+/* ══════════════════════════════════════════════════
+   Stats Row  (ahora 4 columnas)
+   ══════════════════════════════════════════════════ */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+    .stats-row { grid-template-columns: 1fr; }
+}
+
+.stats-card {
+    background: var(--hu-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stats-card__label {
+    font-size: .9rem;
+    color: var(--hu-text-secondary);
+    font-weight: 500;
+}
+
+.stats-card__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stats-card__value--primary { color: var(--hu-primary); }
+.stats-card__value--success  { color: var(--hu-success); }
+.stats-card__value--warning  { color: var(--hu-warning); }
+.stats-card__value--info     { color: #0F7B6C; }           /* verde-azulado para "en consulta" */
+
+/* ══════════════════════════════════════════════════
+   Patient Table (shared con patients.index)
+   ══════════════════════════════════════════════════ */
+.patient-table-wrapper {
+    overflow-x: auto;
+}
+
+.patient-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.patient-table thead tr {
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.patient-table th {
+    padding: 14px 24px;
+    font-size: .78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--hu-text-secondary);
+}
+
+.patient-table td {
+    padding: 16px 24px;
+    font-size: .95rem;
+    color: var(--hu-text);
+    border-bottom: 1px solid var(--hu-border);
+    vertical-align: middle;
+}
+
+.patient-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hover: fondo suave + mostrar estetoscopio */
+.patient-row {
+    transition: background var(--transition);
+}
+
+.patient-row:hover {
+    background: #F4F8FD;
+}
+
+/* Ícono de acción hover — estetoscopio */
+.patient-arrow {
+    width: 36px;
+    text-align: center;
+    color: var(--hu-primary);
+    opacity: 0;
+    font-size: 1.1rem;
+    transition: opacity var(--transition);
+}
+
+.patient-row:hover .patient-arrow {
+    opacity: 1;
+}
+
+/* Avatar circular */
+.patient-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.patient-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: #D8E6F7;
+    color: var(--hu-primary);
+    font-weight: 600;
+    font-size: .82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.patient-name {
+    font-weight: 500;
+}
+
+.patient-dni,
+.patient-secondary {
+    color: var(--hu-text-secondary);
+}
+
+/* Hora de turno — negrita, color primario */
+.patient-hora {
+    color: var(--hu-primary);
+    font-size: .95rem;
+}
+
+.patient-hora strong {
+    font-weight: 700;
+}
+
+/* Columna estado: no colapsa */
+.patient-estado {
+    white-space: nowrap;
+}
+
+/* Empty state */
+.patient-empty {
+    text-align: center;
+    color: var(--hu-text-secondary);
+    padding: 48px 0;
+}
+
+/* ══════════════════════════════════════════════════
+   Badges de estado de turno
+   ══════════════════════════════════════════════════ */
+.estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.estado-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Atendido — gris neutro */
+.badge-atendido {
+    background: #F0F0F0;
+    color: #555;
+    border-color: #DDD;
+}
+.badge-atendido .estado-dot { background: #999; }
+
+/* En consulta — verde */
+.badge-en-consulta {
+    background: #E8F8F4;
+    color: #0F7B6C;
+    border-color: #B2E5DC;
+}
+.badge-en-consulta .estado-dot { background: #0F7B6C; }
+
+/* Arribado — azul primario */
+.badge-arribado {
+    background: #E8EFF8;
+    color: var(--hu-primary);
+    border-color: #BDD0E8;
+}
+.badge-arribado .estado-dot { background: var(--hu-primary); }
+
+/* Pendiente — naranja/dorado */
+.badge-pendiente {
+    background: #FBF5EA;
+    color: #7A5C1E;
+    border-color: #EDD9A3;
+}
+.badge-pendiente .estado-dot { background: #C7A36E; }
+
+/* ══════════════════════════════════════════════════
+   Calendario mensual
+   ══════════════════════════════════════════════════ */
+.cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.cal-nav-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--hu-text);
+}
+
+.cal-nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--hu-border);
+    background: var(--hu-surface);
+    color: var(--hu-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.cal-nav-btn:hover {
+    border-color: var(--hu-primary);
+    color: var(--hu-primary);
+}
+
+/* Grilla 7 columnas */
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.cal-weekday {
+    text-align: center;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--hu-text-secondary);
+    padding: 8px 0;
+}
+
+.cal-day {
+    position: relative;
+    min-height: 68px;
+    border-radius: 12px;
+    border: 1px solid var(--hu-border);
+    background: var(--hu-surface);
+    padding: 10px;
+    text-decoration: none;
+    color: var(--hu-text);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.cal-day:hover {
+    border-color: var(--hu-primary);
+    background: #F4F8FD;
+    color: var(--hu-text);
+}
+
+.cal-day--empty {
+    background: transparent;
+    border-color: transparent;
+    pointer-events: none;
+}
+
+.cal-day--today {
+    border-color: var(--hu-primary);
+    background: #EBF1F9;
+}
+
+.cal-day--today .cal-day__num {
+    font-weight: 700;
+    color: var(--hu-primary);
+}
+
+.cal-day--has-turnos {
+    background: var(--hu-surface);
+}
+
+.cal-day__num {
+    font-size: .9rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* Contador de turnos: bolita con número */
+.cal-day__dot {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--hu-primary);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 0 5px;
+}
+
+/* Leyenda */
+.cal-legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.cal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .82rem;
+    color: var(--hu-text-secondary);
+}
+
+.cal-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cal-legend-dot--today  { background: var(--hu-primary); }
+.cal-legend-dot--turnos { background: var(--hu-primary); opacity: .4; border: 1px solid var(--hu-primary); }

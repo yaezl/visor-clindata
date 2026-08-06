@@ -1,0 +1,262 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Sección de Vacunación
+   Agregar al final de resources/css/patient-detail.css
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── Aviso sin fecha de nacimiento ────────────────────────────────────── */
+
+.vac-aviso {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: var(--hu-text-secondary);
+    margin-bottom: 16px;
+}
+
+/* ── Bloques ───────────────────────────────────────────────────────────── */
+
+.vac-bloque {
+    margin-bottom: 24px;
+}
+
+.vac-bloque--este-anio {
+    border-top: 1px solid var(--hu-border);
+    padding-top: 20px;
+    margin-bottom: 0;
+}
+
+.vac-bloque-titulo {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--hu-text-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* reset por si patient-detail.css tiene margin en p */
+    padding: 0;
+}
+
+.vac-edad-pill {
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hu-background);
+    border: 1px solid var(--hu-border);
+    color: var(--hu-text-secondary);
+}
+
+/* ── Grid (reemplaza <table> para evitar colisiones de estilos globales) ─ */
+
+.vac-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 250px;
+    border: 1px solid var(--hu-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--hu-surface);
+}
+
+/* Header */
+.vac-grid-header {
+    display: contents;
+}
+
+.vac-grid-header > div{
+    background: var(--hu-background);
+    color: var(--hu-text);
+    padding: 16px 18px;
+    font-size: .82rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    border-bottom: 1px solid var(--hu-border);
+}
+
+.vac-grid-header > div,
+.vac-grid-row > div{
+    border-right: 1px solid var(--hu-border);
+}
+
+.vac-grid-header > div:last-child,
+.vac-grid-row > div:last-child{
+    border-right: none;
+}
+
+/* Filas */
+.vac-grid-row {
+    display: contents;
+}
+
+.vac-grid-row > div {
+    padding: 18px;
+    border-bottom: 1px solid var(--hu-border);
+    display: flex;
+    align-items: center;
+    background: var(--hu-surface);
+    box-sizing: border-box;
+    /* reset */
+    margin: 0;
+    min-height: 0;
+}
+
+/* Última fila sin borde inferior */
+.vac-grid-row:last-child > div {
+    border-bottom: none;
+}
+
+/* Hover: hay que colorear las 3 celdas de la fila a la vez */
+.vac-grid-row:hover > div {
+    background: var(--hu-background);
+}
+
+/* ── Celda: nombre ─────────────────────────────────────────────────────── */
+
+.vac-cell-nombre {
+    gap: 10px;
+}
+
+.vac-icono {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hu-text-secondary);
+    font-size: .8rem;
+    flex-shrink: 0;
+}
+
+.vac-icono--anio {
+    background: rgba(199, 163, 110, .12);
+    border-color: rgba(199, 163, 110, .4);
+    color: var(--hu-secondary);
+}
+
+.vac-nombre {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+/* ── Celda: cuándo ─────────────────────────────────────────────────────── */
+
+.vac-cell-cuando {
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--hu-text-secondary);
+}
+
+.vac-cell-cuando i {
+    font-size: .8rem;
+    opacity: .55;
+    flex-shrink: 0;
+}
+
+/* ── Celda: dosis ──────────────────────────────────────────────────────── */
+
+.vac-cell-dosis {
+    justify-content: flex-start;
+}
+
+.vac-chip {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    background: rgba(0, 55, 100, .07);
+    color: var(--hu-primary);
+    border: 1px solid rgba(0, 55, 100, .15);
+    /* reset por si hay estilos de badge globales */
+    line-height: 1.4;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.vac-chip--anio {
+    background: rgba(199, 163, 110, .12);
+    color: var(--hu-secondary);
+    border-color: rgba(199, 163, 110, .4);
+}
+
+/* ── Estado vacío "este año" ───────────────────────────────────────────── */
+
+.vac-empty-anio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid var(--hu-border);
+    border-radius: 8px;
+    background: var(--hu-surface);
+}
+
+.vac-empty-anio-texto {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: .84rem;
+    color: var(--hu-text-secondary);
+    font-style: italic;
+}
+
+.vac-empty-anio-texto i {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: .7;
+}
+
+.vac-empty-anio-icon {
+    font-size: 2.2rem;
+    color: var(--hu-border);
+    flex-shrink: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+    .vac-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* En mobile ocultamos el header y apilamos las celdas */
+    .vac-grid-header {
+        display: none;
+    }
+
+    .vac-grid-row > div {
+        border-bottom: none;
+        padding: 4px 14px;
+    }
+
+    .vac-grid-row > div:first-child {
+        padding-top: 10px;
+    }
+
+    .vac-grid-row > div:last-child {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--hu-border);
+    }
+
+    .vac-grid-row:last-child > div:last-child {
+        border-bottom: none;
+    }
+
+    .vac-cell-cuando {
+        padding-left: 36px; /* alinea con el nombre */
+    }
+
+    .vac-cell-dosis {
+        padding-left: 36px;
+    }
+}

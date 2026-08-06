@@ -1,0 +1,43 @@
+:root {
+
+    /* Colores institucionales */
+
+    --hu-primary: #003764;
+    --hu-secondary: #C7A36E;
+
+    /* Colores auxiliares */
+
+    --hu-primary-hover: #0b4c84;
+
+    --hu-background: #EEF3F8;
+
+    --hu-surface: #FFFFFF;
+
+    --hu-border: #DCE3EC;
+
+    --hu-text: #24364B;
+
+    --hu-text-secondary: #6E7B8B;
+
+    --hu-success: #198754;
+
+    --hu-info: #0F7B6C;
+
+    --hu-warning: #C7A36E;
+
+    --hu-danger: #DC3545;
+
+    /* Layout */
+
+    --sidebar-width: 280px;
+
+    --topbar-height: 105px;
+
+    --border-radius: 18px;
+
+    --shadow-card:
+        0 4px 16px rgba(0,0,0,.05);
+
+    --transition:
+        .2s ease;
+}
