@@ -123,6 +123,14 @@
 
 .history-card .accordion-button{
 
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:flex-start;
+
+    width:100%;
+
     padding:18px 22px;
 
     background:transparent;
@@ -141,6 +149,10 @@
 
 .history-card .accordion-button::after{
 
+    margin-left:24px; /* separa la flecha del contenido */
+
+    flex-shrink:0;
+
     opacity:.6;
 
     transform:scale(.8);
@@ -151,29 +163,49 @@
    HEADER CARD
 ========================================================== */
 
+.history-header{
+    width:100%;
+}
+
 .history-row{
-
     display:flex;
-
-    justify-content:space-between;
-
     align-items:flex-start;
-
-    gap:24px;
-
+    width:100%;
+    justify-content:space-between;
 }
 
 .history-left{
-
     flex:1;
-
+    min-width:0;
 }
 
 .history-right{
-
-    text-align:right;
-
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:flex-start;
+    margin-left:24px;
     flex-shrink:0;
+    min-width:120px;
+}
+
+.history-date{
+
+    font-size:.82rem;
+
+    color:var(--hu-text-secondary);
+
+    font-weight:600;
+
+}
+
+.history-hour{
+
+    margin-top:2px;
+
+    font-size:.78rem;
+
+    color:var(--hu-text-secondary);
 
 }
 

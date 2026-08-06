@@ -26,13 +26,25 @@
 
                     <div class="patient-detail-meta">
 
-                        @if($persona->fecha_nacimiento)
-                            <span>
-                                {{ \Carbon\Carbon::parse($persona->fecha_nacimiento)->age }} años
-                            </span>
+                            @if($persona->fecha_nacimiento)
 
-                            <span class="dot"></span>
-                        @endif
+                                @php
+                                    $fechaNacimiento = \Carbon\Carbon::parse($persona->fecha_nacimiento);
+
+                                    if ($fechaNacimiento->diffInYears() >= 1) {
+                                        $edad = (int) $fechaNacimiento->diffInYears() . ' años';
+                                    } elseif ($fechaNacimiento->diffInMonths() >= 1) {
+                                        $edad = (int) $fechaNacimiento->diffInMonths() . ' meses';
+                                    } else {
+                                        $edad = (int) $fechaNacimiento->diffInDays() . ' días';
+                                    }
+                                @endphp
+
+                                <span>{{ $edad }}</span>
+
+                                <span class="dot"></span>
+
+                            @endif
 
                         <span>
                             {{ $persona->sexo ?? '-' }}
