@@ -36,11 +36,10 @@ class DashboardController extends Controller
             \Log::error('Dashboard QueryException: ' . $e->getMessage());
             $turnosMapeados = [];
             $stats = [
-                'total'       => 0,
-                'atendidos'   => 0,
-                'en_consulta' => 0,
-                'arribados'   => 0,
-                'pendientes'  => 0,
+                'total'      => 0,
+                'atendidos'  => 0,
+                'arribados'  => 0,
+                'pendientes' => 0,
             ];
         }
 

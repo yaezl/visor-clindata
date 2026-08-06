@@ -28,7 +28,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string'],   // acepta usuario tipo "nombre.apellido"
             'password' => ['required', 'string'],
         ];
     }
@@ -42,7 +42,23 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // El campo se llama "email" en el form pero puede contener un username
+        // tipo "nombre.apellido". Primero intentamos por email; si no existe
+        // ningún usuario con ese email, intentamos buscar por la columna `name`
+        // (que almacena el nombre de usuario en nuestro sistema).
+        $credential = $this->string('email')->toString();
+        $password   = $this->string('password')->toString();
+        $remember   = $this->boolean('remember');
+
+        // Intento 1: el valor ingresado ES un e-mail
+        if (str_contains($credential, '@')) {
+            $authenticated = Auth::attempt(['email' => $credential, 'password' => $password], $remember);
+        } else {
+            // Intento 2: buscar por el campo `name` (username tipo "nombre.apellido")
+            $authenticated = Auth::attempt(['name' => $credential, 'password' => $password], $remember);
+        }
+
+        if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

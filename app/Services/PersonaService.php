@@ -19,23 +19,60 @@ class PersonaService
      * Búsqueda unificada por nombre, apellido, DNI o nro de historia clínica.
      * Devuelve paginado para que la vista pueda navegar páginas.
      */
-    public function buscarPorQ(string $q = '', int $porPagina = 20): LengthAwarePaginator
+    public function buscarPorQ(string $q = '', int $porPagina = 20, array $filtros = []): LengthAwarePaginator
     {
         $query = Persona::query()
-            ->select(['id', 'documento', 'apellidos', 'nombres', 'apellido_materno', 'nro_hc', 'nombre_alias', 'usar_nombre_alias'])
+            ->select(['id', 'documento', 'apellidos', 'nombres', 'apellido_materno', 'nro_hc', 'nombre_alias', 'usar_nombre_alias', 'sexo', 'fecha_nacimiento'])
             ->whereDoesntHave('personal');
 
+        // ── Búsqueda por texto libre ─────────────────────────────────────
         if ($q !== '') {
             $like = "%{$q}%";
 
-            $query->where(function ($sub) use ($like, $q) {
-                $sub->where('nombres',          'like', $like)
-                    ->orWhere('apellidos',       'like', $like)
-                    ->orWhere('apellido_materno','like', $like)
-                    ->orWhere('nombre_alias',    'like', $like)
-                    ->orWhere('documento',       'like', $like)
-                    ->orWhere('nro_hc',          'like', $like);
+            $query->where(function ($sub) use ($like) {
+                $sub->where('nombres',           'like', $like)
+                    ->orWhere('apellidos',        'like', $like)
+                    ->orWhere('apellido_materno', 'like', $like)
+                    ->orWhere('nombre_alias',     'like', $like)
+                    ->orWhere('documento',        'like', $like)
+                    ->orWhere('nro_hc',           'like', $like);
             });
+        }
+
+        // ── Filtro por sexo (M / F) ──────────────────────────────────────
+        if (!empty($filtros['sexo'])) {
+            $query->where('sexo', strtoupper($filtros['sexo']));
+        }
+
+        // ── Filtro por rango de edad ─────────────────────────────────────
+        if (!empty($filtros['edad_desde']) || !empty($filtros['edad_hasta'])) {
+            $hoy = now()->toDateString();
+
+            if (!empty($filtros['edad_hasta'])) {
+                // fecha_nacimiento >= hoy - edad_hasta años (personas no "más viejas" que el límite)
+                $fechaMin = now()->subYears((int)$filtros['edad_hasta'])->toDateString();
+                $query->where('fecha_nacimiento', '>=', $fechaMin);
+            }
+
+            if (!empty($filtros['edad_desde'])) {
+                // fecha_nacimiento <= hoy - edad_desde años (personas que ya cumplieron esa edad)
+                $fechaMax = now()->subYears((int)$filtros['edad_desde'])->toDateString();
+                $query->where('fecha_nacimiento', '<=', $fechaMax);
+            }
+        }
+
+        // ── Filtro por obra social / financiador ─────────────────────────
+        // La relación depende del modelo Cobertura / Plan. Si la tabla no existe
+        // en este entorno, el filtro se ignora silenciosamente.
+        if (!empty($filtros['obra_social'])) {
+            $likeOs = '%' . $filtros['obra_social'] . '%';
+            try {
+                $query->whereHas('personas_plan.plan.obra_social', function ($sub) use ($likeOs) {
+                    $sub->where('nombre', 'like', $likeOs);
+                });
+            } catch (\Throwable) {
+                // La relación no existe en este entorno; ignoramos el filtro.
+            }
         }
 
         return $query->orderBy('apellidos')->paginate($porPagina)->withQueryString();

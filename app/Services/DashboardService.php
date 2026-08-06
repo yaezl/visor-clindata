@@ -33,28 +33,21 @@ class DashboardService
      * Arma los contadores del día a partir de los turnos reales.
      *
      * Lógica de clasificación (en orden de prioridad):
-     *   - "atendido"   → nombre del estado contiene 'atend'
-     *   - "en_consulta"→ nombre del estado contiene 'consul' o 'curso'
-     *   - "arribado"   → fechahora_arribo está presente y no es nulo
-     *   - "pendiente"  → todo lo demás
-     *
-     * TODO(backend): Confirmar con el equipo qué IDs/nombres de EstadoTurno
-     * corresponden a cada categoría en la BD de Alephoo.
+     *   - "atendido"  → el nombre del estado contiene 'atend'
+     *   - "arribado"  → fechahora_arribo presente O nombre contiene 'arrib'
+     *   - "pendiente" → todo lo demás (no llegó, no fue atendido)
      */
     public function estadisticasDelDia(Collection $turnos): array
     {
-        $atendidos   = 0;
-        $en_consulta = 0;
-        $arribados   = 0;
-        $pendientes  = 0;
+        $atendidos  = 0;
+        $arribados  = 0;
+        $pendientes = 0;
 
         foreach ($turnos as $turno) {
             $estado = mb_strtolower(optional($turno->estado_turno)->nombre ?? '');
 
             if (str_contains($estado, 'atend')) {
                 $atendidos++;
-            } elseif (str_contains($estado, 'consul') || str_contains($estado, 'curso')) {
-                $en_consulta++;
             } elseif (!is_null($turno->fechahora_arribo) || str_contains($estado, 'arrib')) {
                 $arribados++;
             } else {
@@ -63,11 +56,10 @@ class DashboardService
         }
 
         return [
-            'total'       => $turnos->count(),
-            'atendidos'   => $atendidos,
-            'en_consulta' => $en_consulta,
-            'arribados'   => $arribados,
-            'pendientes'  => $pendientes,
+            'total'      => $turnos->count(),
+            'atendidos'  => $atendidos,
+            'arribados'  => $arribados,
+            'pendientes' => $pendientes,
         ];
     }
 
@@ -79,18 +71,17 @@ class DashboardService
     {
         $estado = mb_strtolower(optional($turno->estado_turno)->nombre ?? '');
 
+        // Atendido → ya pasó la consulta
         if (str_contains($estado, 'atend')) {
-            return ['label' => 'Atendido',    'css' => 'badge-atendido'];
+            return ['label' => 'Atendido', 'css' => 'badge-atendido'];
         }
 
-        if (str_contains($estado, 'consul') || str_contains($estado, 'curso')) {
-            return ['label' => 'En consulta', 'css' => 'badge-en-consulta'];
-        }
-
+        // Arribado → llegó al consultorio, espera ser llamado
         if (!is_null($turno->fechahora_arribo) || str_contains($estado, 'arrib')) {
-            return ['label' => 'Arribado',    'css' => 'badge-arribado'];
+            return ['label' => 'Arribado', 'css' => 'badge-arribado'];
         }
 
+        // Pendiente → todavía no llegó ni fue atendido
         return ['label' => 'Pendiente', 'css' => 'badge-pendiente'];
     }
 }

@@ -11,7 +11,7 @@
         <h3 class="topbar-greeting">
 
             Hola,
-            {{ Auth::user()->name ?? 'Profesional' }}
+            {{ Str::of(Auth::user()->name ?? 'Profesional')->replace('.', ' ')->title() }}
 
         </h3>
 
@@ -21,12 +21,15 @@
 
         <div class="avatar">
 
-            {{ Str::of(Auth::user()->name ?? 'P')
-                ->explode(' ')
-                ->map(fn($n)=>Str::substr($n,0,1))
-                ->take(2)
-                ->join('')
-            }}
+            @php
+                $iniciales = strtoupper(
+                    collect(explode(' ', str_replace('.', ' ', Auth::user()->name ?? 'P')))
+                        ->map(fn($n) => substr($n, 0, 1))
+                        ->take(2)
+                        ->join('')
+                );
+            @endphp
+            {{ $iniciales }}
 
         </div>
 

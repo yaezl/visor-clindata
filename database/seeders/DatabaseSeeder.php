@@ -10,24 +10,31 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // firstOrCreate evita duplicados: busca por el email, si no existe lo crea con los demás datos
-        User::firstOrCreate(
-            ['email' => 'medico@clindata.com'], // Condición de búsqueda
+        // Usuario principal — se puede ingresar con:
+        //   · email:    medico@clindata.com  / password
+        //   · usuario:  medico.pediatra      / password  (busca por columna `name`)
+        // El `name` actúa como username (login); la topbar mostrará "Hola, Médico Pediatra"
+        // solo si el controlador/topbar usa el campo `name` formateado. Para que la
+        // topbar muestre un nombre legible, guardamos el nombre de usuario en `name`
+        // y el nombre real se mostraría desde Personal/Persona si estuviera vinculado.
+        // Por ahora ajustamos el `name` a algo presentable.
+        User::updateOrCreate(
+            ['email' => 'medico@clindata.com'],
             [
-                'name' => 'Médico Pediatra',
+                'name'     => 'medico.pediatra',
                 'password' => Hash::make('password'),
             ]
         );
 
         // Ejecutamos los demás seeders
         $this->call([
-            PersonalSeeder::class,      // Crea Dra. Fernández (Persona+Personal) + Usuario legacy "sistema"
-            GrupoSanguineoSeeder::class, // Usa el Usuario recién creado
-            PersonaSeeder::class,        // Usa el Usuario recién creado + grupo_sanguineo
+            PersonalSeeder::class,
+            GrupoSanguineoSeeder::class,
+            PersonaSeeder::class,
             TurnoProgramadoSeeder::class,
             DiagnosticoSeeder::class,
-            AntecedenteperinatalSeeder::class, // Usa Persona + Diagnostico
-            AntecedentepatologicoSeeder::class, // Usa Persona + Diagnostico
+            AntecedenteperinatalSeeder::class,
+            AntecedentepatologicoSeeder::class,
             TipoContenidoSeeder::class,
             EventohcSeeder::class,
             ConsultumSeeder::class,

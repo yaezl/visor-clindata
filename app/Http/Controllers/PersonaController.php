@@ -27,11 +27,12 @@ class PersonaController extends Controller
 
     public function index(Request $request): View|JsonResponse
     {
-        $q = $request->input('q', '');
+        $q       = (string) $request->input('q', '');
+        $filtros   = $request->only(['sexo', 'edad_desde', 'edad_hasta', 'obra_social']);
 
         try {
             $personas = $this->personaService
-                ->buscarPorQ($q)
+                ->buscarPorQ($q, filtros: $filtros)
                 ->through(fn ($persona) => [
                     'id'     => $persona->id,
                     'name'   => $persona->nombre_completo,

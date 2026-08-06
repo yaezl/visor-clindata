@@ -76,6 +76,20 @@
     border-radius: 14px;
     font-size: 18px;
     font-weight: 600;
+    /* Sobreescribimos el azul eléctrico de Bootstrap con los colores institucionales */
+    background-color: var(--hu-primary) !important;
+    border-color: var(--hu-primary) !important;
+    color: #fff !important;
+    transition: background-color var(--transition), border-color var(--transition);
+}
+
+.login-button:hover,
+.login-button:focus,
+.login-button:active {
+    background-color: var(--hu-primary-hover) !important;
+    border-color: var(--hu-primary-hover) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(0, 55, 100, 0.25) !important;
 }
 
 .forgot-password {
