@@ -21,10 +21,10 @@
 
     {{-- Stats cards --}}
     <div class="stats-row">
-        <x-stats-card label="Total del día"       :value="$stats['total']"       color="primary" />
-        <x-stats-card label="Atendidos"            :value="$stats['atendidos']"   color="success" />
-        <x-stats-card label="En consulta"          :value="$stats['en_consulta']" color="info"    />
-        <x-stats-card label="Pendientes / Arribados" :value="$stats['pendientes'] + $stats['arribados']" color="warning" />
+        <x-stats-card label="Total del día" :value="$stats['total']"      color="primary" />
+        <x-stats-card label="Atendidos"     :value="$stats['atendidos']"  color="success" />
+        <x-stats-card label="Arribados"     :value="$stats['arribados']"  color="info"    />
+        <x-stats-card label="Pendientes"    :value="$stats['pendientes']" color="warning" />
     </div>
 
     {{-- Tabla de pacientes --}}
