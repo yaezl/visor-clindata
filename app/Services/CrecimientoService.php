@@ -69,6 +69,31 @@ class CrecimientoService
         $talla = round((float) $ultima->talla, 1);   // Se asume en cm
         $imc   = $talla > 0 ? round($peso / (($talla / 100) ** 2), 1) : null;
 
+        // Perímetro cefálico: buscar en medicions primero, si no en antecedente perinatal
+        $ultimaMedicion = $persona->medicions()
+            ->whereNotNull('perimetro_encefalico')
+            ->orderBy('creado_en', 'desc')
+            ->first();
+
+        $perimetroCefalico = $ultimaMedicion
+            ? round((float) $ultimaMedicion->perimetro_encefalico, 1)
+            : null;
+
+        // Si no hay medición, intentar con el antecedente perinatal (valor al nacer)
+        $pcAlNacer = null;
+        $pcFuente  = null;
+
+        if ($perimetroCefalico === null) {
+            $perinatal = $persona->antecedenteperinatals()
+                ->whereNotNull('perimetro_cefalico')
+                ->first();
+
+            if ($perinatal) {
+                $pcAlNacer = round((float) $perinatal->perimetro_cefalico, 1);
+                $pcFuente  = 'nacimiento';
+            }
+        }
+
         // ── Percentiles OMS ───────────────────────────────────────────────
         $sexo       = strtoupper($persona->sexo ?? 'M');   // 'M' o 'F'
         $percentiles = [];
@@ -131,7 +156,9 @@ class CrecimientoService
                 'peso'               => $peso,
                 'talla'              => $talla,
                 'imc'                => $imc,
-                'perimetro_cefalico' => null,  // No está en mediciones_antropometricas; agregar si se suma el campo
+               'perimetro_cefalico' => $perimetroCefalico,
+               'pc_al_nacer'        => $pcAlNacer,
+                'pc_fuente'          => $pcFuente,
             ],
             'historico'        => $historico,
             'percentiles'      => $percentiles,
