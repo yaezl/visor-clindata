@@ -333,3 +333,12 @@
     background: var(--hu-primary-hover);
     color: #fff;
 }
+
+/* Estado de carga de la búsqueda dinámica de pacientes */
+#patientsResults {
+    transition: opacity .15s ease;
+}
+
+#patientsResults.search-results-loading {
+    opacity: .58;
+}
