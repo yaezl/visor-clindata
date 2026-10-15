@@ -38,11 +38,14 @@ class ConsultadetalleSeeder extends Seeder
         // Se recorren las consultas ordenadas por fecha para que, dentro
         // de la historia de un mismo paciente, no se repita el mismo
         // caso clinico dos veces seguidas (mas realista).
+        $consultasConDetalle = Consultadetalle::pluck('consulta_id')->all();
+
         $consultasPorPaciente = Consultum::with('eventohc')
+            ->whereNotIn('id', $consultasConDetalle)
             ->get()
-            ->filter(fn ($consulta) => $consulta->eventohc !== null)
-            ->sortBy(fn ($consulta) => $consulta->eventohc->fechahora)
-            ->groupBy(fn ($consulta) => $consulta->eventohc->persona_id);
+            ->filter(fn($consulta) => $consulta->eventohc !== null)
+            ->sortBy(fn($consulta) => $consulta->eventohc->fechahora)
+            ->groupBy(fn($consulta) => $consulta->eventohc->persona_id);
 
         foreach ($consultasPorPaciente as $consultas) {
 

@@ -22,6 +22,16 @@ class EventohcSeeder extends Seeder
         '67245356' => 6,
         '41555666' => 4,
         '20444555' => 2,  // historia muy corta
+        '55100001' => 3,   // Valentina, 7 meses — pocos controles
+        '55100002' => 5,   // Tomás, 15 meses
+        '55100003' => 7,   // Luciana, 2.5 años
+        '55100004' => 5,   // Agustín, 4 años
+        '55100005' => 6,   // Camila, 5.5 años
+        '55100006' => 8,   // Mateo, 8 años
+        '55100007' => 10,  // Isabella, 10 años
+        '55100008' => 11,  // Santiago, 12 años
+        '55100009' => 12,  // Florencia, 16 años
+        '55100010' => 1,   // Benjamín, recién nacido
     ];
 
     protected const CANTIDAD_POR_DEFECTO = 4;
@@ -43,21 +53,24 @@ class EventohcSeeder extends Seeder
 
             foreach ($this->generarFechas($persona, $cantidad) as $fecha) {
 
-                Eventohc::create([
-                    'tipocontenido_id' => $tipoConsulta->id,
-                    'persona_id'       => $persona->id,
-                    'parent_id'        => null,
-                    'fechahora'        => $fecha,
-                    'datos'            => '',
-                    'root'             => 0,
-                    'lft'              => 0,
-                    'rgt'              => 0,
-                    'lvl'              => 0,
-                    'creadopor_id'     => 1,
-                    'modificadopor_id' => 1,
-                    'deleted_by'       => 0,
-                ]);
-
+                Eventohc::firstOrCreate(
+                    [
+                        'persona_id' => $persona->id,
+                        'fechahora'  => $fecha,
+                    ],
+                    [
+                        'tipocontenido_id' => $tipoConsulta->id,
+                        'parent_id' => null,
+                        'datos' => '',
+                        'root' => 0,
+                        'lft' => 0,
+                        'rgt' => 0,
+                        'lvl' => 0,
+                        'creadopor_id' => 1,
+                        'modificadopor_id' => 1,
+                        'deleted_by' => 0,
+                    ]
+                );
             }
         }
 
