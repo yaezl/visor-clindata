@@ -396,3 +396,198 @@
 
 .cal-legend-dot--today  { background: var(--hu-primary); }
 .cal-legend-dot--turnos { background: var(--hu-primary); opacity: .4; border: 1px solid var(--hu-primary); }
+
+/* Mejoras de interacción del calendario */
+.cal-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.cal-month-panel,
+.cal-day-panel {
+    min-width: 0;
+}
+
+.cal-day {
+    width: 100%;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.cal-day--selected {
+    outline: 2px solid var(--hu-primary);
+    outline-offset: 1px;
+    background: #F4F8FD;
+}
+
+.cal-day--selected .cal-day__num {
+    color: var(--hu-primary);
+    font-weight: 800;
+}
+
+.cal-legend-dot--selected {
+    background: var(--hu-primary);
+    outline: 2px solid var(--hu-primary);
+    outline-offset: 2px;
+}
+
+.cal-day-panel {
+    border: 1px solid var(--hu-border);
+    border-radius: 14px;
+    padding: 18px;
+    background: var(--hu-background, #fafbfd);
+}
+
+.cal-day-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cal-day-panel__title {
+    margin: 0 0 5px;
+    color: var(--hu-text);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.cal-day-panel__date {
+    margin: 0;
+    color: var(--hu-text-secondary);
+    font-size: .82rem;
+    text-transform: capitalize;
+}
+
+.cal-day-panel__count {
+    flex-shrink: 0;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #EBF1F9;
+    color: var(--hu-primary);
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.cal-day-empty {
+    display: flex;
+    min-height: 170px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--hu-text-secondary);
+    padding: 18px;
+}
+
+.cal-day-empty > i {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--hu-primary);
+    opacity: .75;
+}
+
+.cal-day-empty p {
+    margin: 0 0 4px;
+    color: var(--hu-text);
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.cal-day-empty span {
+    font-size: .78rem;
+}
+
+.cal-appointments {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 470px;
+    overflow-y: auto;
+}
+
+.cal-appointment {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--hu-border);
+    border-radius: 10px;
+    background: var(--hu-surface);
+}
+
+.cal-appointment__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 62px;
+    color: var(--hu-primary);
+    font-size: .82rem;
+    font-weight: 700;
+    padding-top: 1px;
+}
+
+.cal-appointment__info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.cal-appointment__info strong {
+    color: var(--hu-text);
+    font-size: .85rem;
+    overflow-wrap: anywhere;
+}
+
+.cal-appointment__info span,
+.cal-appointment__info small {
+    color: var(--hu-text-secondary);
+    font-size: .76rem;
+    overflow-wrap: anywhere;
+}
+
+#calendar-page {
+    transition: opacity .15s ease;
+}
+
+#calendar-page.cal-is-loading {
+    opacity: .58;
+    pointer-events: none;
+}
+
+@media (max-width: 900px) {
+    .cal-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cal-appointments {
+        max-height: 360px;
+    }
+}
+
+@media (max-width: 520px) {
+    .cal-day {
+        min-height: 54px;
+        padding: 7px;
+    }
+
+    .cal-grid {
+        gap: 4px;
+    }
+
+    .cal-day__dot {
+        min-width: 18px;
+        height: 18px;
+        padding: 0 4px;
+        font-size: .68rem;
+    }
+
+    .cal-day-panel {
+        padding: 13px;
+    }
+}

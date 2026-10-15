@@ -51,6 +51,61 @@ class AlergiaSeeder extends Seeder
                     'observaciones' => null,
                 ],
             ],
+            // Luciana Fernández — alergia medicamentosa
+            '55100003' => [
+                [
+                    'nombre'        => 'Ibuprofeno',
+                    'tipo'          => 'Medicamentosa',
+                    'severidad'     => 'Moderada',
+                    'observaciones' => 'Urticaria generalizada. Tolera paracetamol.',
+                ],
+            ],
+
+            // Camila Sánchez — alergia alimentaria
+            '55100005' => [
+                [
+                    'nombre'        => 'Huevo',
+                    'tipo'          => 'Alimentaria',
+                    'severidad'     => 'Leve',
+                    'observaciones' => 'Urticaria localizada. Tolera bien en preparaciones horneadas.',
+                ],
+            ],
+
+            // Isabella Morales — múltiples alergias
+            '55100007' => [
+                [
+                    'nombre'        => 'Amoxicilina',
+                    'tipo'          => 'Medicamentosa',
+                    'severidad'     => 'Severa',
+                    'observaciones' => 'Rash generalizado con angioedema. Evitar todos los betalactámicos.',
+                ],
+                [
+                    'nombre'        => 'Látex',
+                    'tipo'          => 'Ambiental',
+                    'severidad'     => 'Moderada',
+                    'observaciones' => 'Detectada en internación. Usar guantes sin látex.',
+                ],
+            ],
+
+            // Santiago Vega — alergia ambiental
+            '55100008' => [
+                [
+                    'nombre'        => 'Polen',
+                    'tipo'          => 'Ambiental',
+                    'severidad'     => 'Leve',
+                    'observaciones' => 'Rinitis estacional. Empeora en primavera.',
+                ],
+            ],
+
+            // Florencia Núñez — alergia medicamentosa
+            '55100009' => [
+                [
+                    'nombre'        => 'Metamizol',
+                    'tipo'          => 'Medicamentosa',
+                    'severidad'     => 'Moderada',
+                    'observaciones' => 'Hipotensión tras administración IV. Evitar.',
+                ],
+            ],
         ];
 
         foreach ($alergiasPorPaciente as $documento => $alergias) {

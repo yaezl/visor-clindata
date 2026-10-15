@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\DashboardService;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -22,13 +23,13 @@ class DashboardController extends Controller
                 $badge = DashboardService::etiquetaEstado($turno);
 
                 return [
-                    'id'           => optional($turno->persona)->id,
-                    'name'         => optional($turno->persona)->nombre_completo ?? '—',
-                    'dni'          => optional($turno->persona)->documento,
-                    'control'      => $turno->fecha?->toDateString(),
-                    'hora'         => Carbon::parse($turno->hora)->format('H:i'),
+                    'id' => optional($turno->persona)->id,
+                    'name' => optional($turno->persona)->nombre_completo ?? '—',
+                    'dni' => optional($turno->persona)->documento,
+                    'control' => $turno->fecha?->toDateString(),
+                    'hora' => Carbon::parse($turno->hora)->format('H:i'),
                     'estado_label' => $badge['label'],
-                    'estado_css'   => $badge['css'],
+                    'estado_css' => $badge['css'],
                 ];
             })->values()->toArray();
 
@@ -36,9 +37,9 @@ class DashboardController extends Controller
             \Log::error('Dashboard QueryException: ' . $e->getMessage());
             $turnosMapeados = [];
             $stats = [
-                'total'      => 0,
-                'atendidos'  => 0,
-                'arribados'  => 0,
+                'total' => 0,
+                'atendidos' => 0,
+                'arribados' => 0,
                 'pendientes' => 0,
             ];
         }
@@ -50,34 +51,63 @@ class DashboardController extends Controller
     }
 
     /**
-     * Vista de calendario mensual.
-     * Por ahora muestra el mes actual con los turnos del día marcados.
-     * Se puede expandir para traer todos los días del mes con contadores.
+     * Vista de calendario mensual y turnos correspondientes al día seleccionado.
      */
-    public function calendar(): View
+    public function calendar(Request $request): View
     {
-        $hoy        = Carbon::today();
-        $inicioMes  = $hoy->copy()->startOfMonth();
-        $finMes     = $hoy->copy()->endOfMonth();
+        $request->validate([
+            'mes' => ['nullable', 'date_format:Y-m'],
+            'fecha' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+
+        $hoy = Carbon::today();
+        $mesParam = $request->query('mes');
+
+        $inicioMes = $mesParam
+            ? Carbon::createFromFormat('!Y-m', $mesParam)->startOfMonth()
+            : $hoy->copy()->startOfMonth();
+
+        $finMes = $inicioMes->copy()->endOfMonth();
+
+        $fechaSeleccionada = $request->query('fecha')
+            ? Carbon::createFromFormat('!Y-m-d', $request->query('fecha'))
+            : ($inicioMes->isSameMonth($hoy) ? $hoy->copy() : $inicioMes->copy());
+
+        // La fecha seleccionada siempre debe pertenecer al mes que se está viendo.
+        if (!$fechaSeleccionada->isSameMonth($inicioMes)) {
+            $fechaSeleccionada = $inicioMes->isSameMonth($hoy)
+                ? $hoy->copy()
+                : $inicioMes->copy();
+        }
 
         try {
-            // Traemos los turnos del mes completo para marcar los días con actividad
+            // Cantidad de turnos por día para los indicadores de la grilla.
             $turnosMes = \App\Models\TurnoProgramado::query()
-                ->whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
-                ->selectRaw('fecha, COUNT(*) as total')
-                ->groupBy('fecha')
-                ->pluck('total', 'fecha')
+                ->whereBetween('fecha', [$inicioMes->copy()->startOfDay(), $finMes->copy()->endOfDay()])
+                ->selectRaw('DATE(fecha) as fecha_dia, COUNT(*) as total')
+                ->groupByRaw('DATE(fecha)')
+                ->pluck('total', 'fecha_dia')
                 ->toArray();
+
+            // Detalle de los turnos del día seleccionado.
+            $turnosDelDia = \App\Models\TurnoProgramado::query()
+                ->with('persona')
+                ->whereDate('fecha', $fechaSeleccionada->toDateString())
+                ->orderBy('hora')
+                ->get();
         } catch (\Illuminate\Database\QueryException $e) {
             \Log::error('Calendario QueryException: ' . $e->getMessage());
             $turnosMes = [];
+            $turnosDelDia = collect();
         }
 
         return view('dashboard.calendar', [
-            'hoy'       => $hoy,
+            'hoy' => $hoy,
             'inicioMes' => $inicioMes,
-            'finMes'    => $finMes,
+            'finMes' => $finMes,
             'turnosMes' => $turnosMes,
+            'fechaSeleccionada' => $fechaSeleccionada,
+            'turnosDelDia' => $turnosDelDia,
         ]);
     }
 }

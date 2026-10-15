@@ -40,6 +40,53 @@ class MedicacionSeeder extends Seeder
                     'activa' => true,
                 ],
             ],
+            // Mateo Herrera — antiasmático de mantenimiento
+            '55100006' => [
+                [
+                    'nombre'             => 'Montelukast',
+                    'dosis'              => '5mg',
+                    'frecuencia'         => '1 comprimido masticable por noche',
+                    'via_administracion' => 'Oral',
+                    'fecha_inicio'       => now()->subMonths(3),
+                    'fecha_fin'          => null,
+                    'activa'             => true,
+                ],
+            ],
+
+            // Isabella Morales — asma moderada, doble esquema
+            '55100007' => [
+                [
+                    'nombre'             => 'Salbutamol',
+                    'dosis'              => '100mcg',
+                    'frecuencia'         => '2 puff cada 8hs en crisis (rescate)',
+                    'via_administracion' => 'Inhalatoria',
+                    'fecha_inicio'       => now()->subMonths(8),
+                    'fecha_fin'          => null,
+                    'activa'             => true,
+                ],
+                [
+                    'nombre'             => 'Fluticasona',
+                    'dosis'              => '50mcg',
+                    'frecuencia'         => '1 puff cada 12hs (mantenimiento)',
+                    'via_administracion' => 'Inhalatoria',
+                    'fecha_inicio'       => now()->subMonths(8),
+                    'fecha_fin'          => null,
+                    'activa'             => true,
+                ],
+            ],
+
+            // Florencia Núñez — anticoncepción oral
+            '55100009' => [
+                [
+                    'nombre'             => 'Anticonceptivos orales',
+                    'dosis'              => '1 comprimido diario',
+                    'frecuencia'         => 'Tomar 21 días, descansar 7',
+                    'via_administracion' => 'Oral',
+                    'fecha_inicio'       => now()->subMonths(4),
+                    'fecha_fin'          => null,
+                    'activa'             => true,
+                ],
+            ],
         ];
 
         foreach ($medicacionPorPaciente as $documento => $medicaciones) {

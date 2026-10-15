@@ -24,17 +24,17 @@
 
         <div class="mb-4">
 
-            <label class="form-label text-uppercase fw-semibold small letter-spacing-1" for="username">
+            <label class="form-label text-uppercase fw-semibold small letter-spacing-1" for="usuario">
                 Usuario
             </label>
 
             <input
-                id="username"
-                name="email"
+                id="usuario"
+                name="username"
                 class="form-control @error('email') is-invalid @enderror"
                 type="text"
-                placeholder="Dr. Juan Perez"
-                value="{{ old('email') }}"
+                placeholder="medico.pediatra"
+                value="{{ old('username') }}"
                 autofocus
                 autocomplete="username"
             >

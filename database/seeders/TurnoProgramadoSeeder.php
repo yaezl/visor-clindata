@@ -46,13 +46,13 @@ class TurnoProgramadoSeeder extends Seeder
 
         if ($dia->lt($hoy)) {
             // Pasado: todos atendidos, excepto el último que quedó pendiente
-            return array_map(fn ($i) => ($i < $totalPacientes - 1) ? 2 : 1, range(0, $totalPacientes - 1));
+            return array_map(fn($i) => ($i < $totalPacientes - 1) ? 2 : 1, range(0, $totalPacientes - 1));
         }
 
         if ($dia->isToday()) {
             // Hoy: cíclico 2, 2, 3, 1, 1  (Atendido, Atendido, Arribado, Pendiente, Pendiente)
             $patron = [2, 2, 3, 1, 1];
-            return array_map(fn ($i) => $patron[$i % count($patron)], range(0, $totalPacientes - 1));
+            return array_map(fn($i) => $patron[$i % count($patron)], range(0, $totalPacientes - 1));
         }
 
         // Futuro: todos Pendiente
@@ -96,7 +96,7 @@ class TurnoProgramadoSeeder extends Seeder
             'hora_inicio'         => '08:00:00',
             'hora_fin'            => '13:00:00',
             'inicio_vigencia'     => '2026-08-05',
-            'fin_vigencia'        => '2026-08-31',
+            'fin_vigencia'    => '2026-12-31',
             'duracion_turno'      => 20,
             'limite_pacientes'    => 20,
             'frecuencia'          => 1,
@@ -122,25 +122,38 @@ class TurnoProgramadoSeeder extends Seeder
             return;
         }
 
-        // ── 4. Turnos del 5 al 10 de agosto de 2026 ─────────────────────────
-        $fechas = [
-            Carbon::parse('2026-08-05'),
-            Carbon::parse('2026-08-06'),
-            Carbon::parse('2026-08-07'),
-            Carbon::parse('2026-08-08'),
-            Carbon::parse('2026-08-09'),
-            Carbon::parse('2026-08-10'),
-        ];
+        // ── 4. Turnos hoy → 31/12/2026, lunes a viernes ──────────────────────
+        $feriados = collect([
+            '2026-10-12',
+            '2026-11-20',
+            '2026-12-08',
+            '2026-12-25',
+        ]);
+
+        $fechas = collect();
+        $cursor = Carbon::today();
+        $fin    = Carbon::parse('2026-12-31');
+        while ($cursor->lte($fin)) {
+            if ($cursor->isWeekday() && ! $feriados->contains($cursor->toDateString())) {
+                $fechas->push($cursor->copy());
+            }
+            $cursor->addDay();
+        }
 
         $totalTurnos = 0;
 
-        foreach ($fechas as $fecha) {
-            $distribucion = $this->distribucionParaDia($fecha, $pacientes->count());
-            $inicio       = $fecha->copy()->setTime(8, 0, 0);
+        $totalPacientes = $pacientes->count();
+        $idxGlobal      = 0;   // round-robin entre todos los pacientes
 
-            foreach ($pacientes as $indice => $paciente) {
-                $estadoId = $distribucion[$indice];
-                $hora     = $inicio->copy()->addMinutes(20 * $indice);
+        foreach ($fechas as $fecha) {
+            $turnosPorDia = 5;   // turnos por día
+            $distribucion = $this->distribucionParaDia($fecha, $turnosPorDia);
+            $inicio       = $fecha->copy()->setTime(8, 0, 0);
+            for ($slot = 0; $slot < $turnosPorDia; $slot++) {
+                $paciente = $pacientes[$idxGlobal % $totalPacientes];
+                $estadoId = $distribucion[$slot];
+                $hora     = $inicio->copy()->addMinutes(20 * $slot);
+                $indice   = $slot;
 
                 $arribo    = null;
                 $noAsistio = null;
@@ -177,11 +190,12 @@ class TurnoProgramadoSeeder extends Seeder
                 ]);
 
                 $totalTurnos++;
+                $idxGlobal++;
             }
         }
 
         Schema::enableForeignKeyConstraints();
 
-        $this->command->info("TurnoProgramadoSeeder: {$totalTurnos} turnos creados en " . count($fechas) . " días (5 al 10 de agosto de 2026). Agenda ID: {$agendaId}.");
+        $this->command->info("TurnoProgramadoSeeder: {$totalTurnos} turnos creados (hoy → 31/12/2026). Agenda ID: {$agendaId}.");
     }
 }

@@ -42,7 +42,27 @@ class MedicionesAntropometricasSeeder extends Seeder
         $carlos = Persona::where('documento', '67245356')->first();
         $sofia  = Persona::where('documento', '41555666')->first();
         $ramon  = Persona::where('documento', '20444555')->first();
+        $valentina = Persona::where('documento', '55100001')->first();
+        $tomas     = Persona::where('documento', '55100002')->first();
+        $luciana   = Persona::where('documento', '55100003')->first();
+        $agustin   = Persona::where('documento', '55100004')->first();
+        $camila    = Persona::where('documento', '55100005')->first();
+        $mateo     = Persona::where('documento', '55100006')->first();
+        $isabella  = Persona::where('documento', '55100007')->first();
+        $santiago  = Persona::where('documento', '55100008')->first();
+        $florencia = Persona::where('documento', '55100009')->first();
+        $benjamin  = Persona::where('documento', '55100010')->first();
 
+        if ($valentina) $this->medicionesValentina($valentina);
+        if ($tomas)     $this->medicionesTomas($tomas);
+        if ($luciana)   $this->medicionesLuciana($luciana);
+        if ($agustin)   $this->medicionesAgustin($agustin);
+        if ($camila)    $this->medicionesCamila($camila);
+        if ($mateo)     $this->medicionesMateo($mateo);
+        if ($isabella)  $this->medicionesIsabella($isabella);
+        if ($santiago)  $this->medicionesSantiago($santiago);
+        if ($florencia) $this->medicionesFlorencia($florencia);
+        if ($benjamin)  $this->medicionesBenjamin($benjamin);
         if ($juan)   $this->medicionesJuan($juan);
         if ($maria)  $this->medicionesMaria($maria);
         if ($carlos) $this->medicionesCarlos($carlos);
@@ -50,7 +70,7 @@ class MedicionesAntropometricasSeeder extends Seeder
         if ($ramon)  $this->medicionesRamon($ramon);
 
         $this->command->info('✓ Mediciones antropométricas cargadas para:');
-        foreach (compact('juan', 'maria', 'carlos', 'sofia', 'ramon') as $nombre => $persona) {
+        foreach (compact('juan', 'maria', 'carlos', 'sofia', 'ramon', 'valentina', 'tomas', 'luciana', 'agustin', 'camila', 'mateo', 'isabella', 'santiago', 'florencia', 'benjamin') as $nombre => $persona) {
             $estado = $persona ? "id {$persona->id}" : '⚠ no encontrado (correr PersonaSeeder primero)';
             $this->command->info("  · {$nombre}: {$estado}");
         }
@@ -178,6 +198,174 @@ class MedicionesAntropometricasSeeder extends Seeder
         ];
 
         $this->insertar($persona->id, $nac, $controles, modo: 'anios');
+    }
+
+        private function medicionesValentina(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0, 2.8, 47.0],
+            [1, 3.8, 52.0],
+            [2, 4.9, 56.0],
+            [4, 6.1, 62.0],
+            [6, 7.0, 66.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
+    }
+
+    private function medicionesTomas(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  3.5, 51.0],
+            [2,  5.8, 58.5],
+            [4,  7.0, 63.5],
+            [6,  8.0, 67.5],
+            [9,  9.2, 72.5],
+            [12, 10.2, 76.0],
+            [15, 11.0, 79.5],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
+    }
+
+    private function medicionesLuciana(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  2.4, 45.0],
+            [2,  4.2, 54.0],
+            [4,  5.5, 60.0],
+            [6,  6.5, 65.0],
+            [9,  7.8, 70.0],
+            [12, 8.7, 74.5],
+            [18, 10.2, 80.5],
+            [24, 11.5, 86.0],
+            [30, 12.8, 91.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
+    }
+
+    private function medicionesAgustin(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  4.2, 53.0],
+            [3,  7.2, 63.0],
+            [6,  8.8, 69.0],
+            [12, 10.8, 77.5],
+            [18, 12.2, 83.5],
+            [24, 13.7, 89.0],
+            [36, 15.5, 97.0],
+            [48, 17.3, 104.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
+    }
+
+    private function medicionesCamila(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  3.1, 49.0],
+            [6,  7.5, 66.5],
+            [12, 9.5, 75.0],
+            [24, 12.0, 87.0],
+            [36, 14.2, 95.5],
+            [48, 16.3, 103.0],
+            [60, 18.4, 110.0],
+            [66, 19.3, 113.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
+    }
+
+    private function medicionesMateo(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  3.6, 51.0],
+            [1,  9.8, 76.0],
+            [2, 12.5, 88.0],
+            [3, 15.2, 97.0],
+            [4, 17.5, 104.0],
+            [5, 19.8, 111.0],
+            [6, 22.0, 118.5],
+            [7, 24.5, 124.5],
+            [8, 27.2, 130.5],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'anios');
+    }
+
+    private function medicionesIsabella(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  2.7,  46.0],
+            [1,  8.5,  73.0],
+            [2, 11.0,  84.5],
+            [3, 13.2,  93.0],
+            [4, 15.5, 101.0],
+            [5, 17.8, 108.5],
+            [6, 20.5, 116.0],
+            [7, 23.0, 122.5],
+            [8, 26.0, 128.5],
+            [9, 29.5, 134.0],
+            [10, 33.0, 140.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'anios');
+    }
+
+    private function medicionesSantiago(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  4.1,  53.0],
+            [1, 11.0,  77.0],
+            [2, 13.8,  89.0],
+            [3, 16.2,  97.5],
+            [4, 18.8, 105.0],
+            [5, 21.5, 112.5],
+            [6, 24.5, 119.5],
+            [7, 27.5, 126.5],
+            [8, 31.0, 133.0],
+            [9, 35.0, 139.5],
+            [10, 40.0, 146.0],
+            [11, 46.0, 153.0],
+            [12, 52.0, 159.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'anios');
+    }
+
+    private function medicionesFlorencia(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0,  3.3,  50.0],
+            [1,  9.5,  75.5],
+            [2, 12.1,  87.5],
+            [3, 14.5,  96.5],
+            [4, 16.8, 104.0],
+            [5, 19.2, 111.5],
+            [6, 21.8, 118.5],
+            [7, 24.5, 124.5],
+            [8, 27.5, 130.5],
+            [9, 31.0, 136.0],
+            [10, 35.5, 141.5],
+            [11, 41.0, 147.0],
+            [12, 46.5, 153.5],
+            [13, 50.5, 158.0],
+            [14, 53.0, 161.0],
+            [15, 54.5, 162.5],
+            [16, 55.5, 163.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'anios');
+    }
+
+    private function medicionesBenjamin(Persona $persona): void
+    {
+        $nac = Carbon::parse($persona->fecha_nacimiento);
+        $controles = [
+            [0, 3.2, 50.0],
+        ];
+        $this->insertar($persona->id, $nac, $controles, modo: 'meses');
     }
 
     // ══════════════════════════════════════════════════════════════════

@@ -6,6 +6,7 @@
         placeholder="Buscar por Nombre, DNI o Historia Clínica..."
     />
 
+    <div id="patientsResults" aria-live="polite" aria-busy="false">
     {{-- Resultados --}}
     @php
         $hayFiltros = request()->filled('q')
@@ -62,6 +63,7 @@
             {{ $personas->links() }}
         </div>
     @endif
+    </div>{{-- /patientsResults --}}
 
     {{-- ═══════════════════════════════════════════
          PANEL DE FILTROS (drawer derecho)

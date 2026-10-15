@@ -115,9 +115,13 @@
                 </div>
                 @if ($ult['perimetro_cefalico'])
                     <p class="crec-chip-valor">{{ $ult['perimetro_cefalico'] }} <small>cm</small></p>
+                @elseif ($ult['pc_al_nacer'])
+                    <p class="crec-chip-valor">{{ $ult['pc_al_nacer'] }} <small>cm</small></p>
+                    <p class="crec-chip-sub">Al nacer</p>
+                @elseif (($c['edad_meses_total'] ?? 999) <= 36)
+                    <p class="crec-chip-valor crec-chip-valor--nd">Sin dato cargado</p>
                 @else
-                    <p class="crec-chip-valor crec-chip-valor--nd">No aplica a esta edad</p>
-                    <p class="crec-chip-sub">—</p>
+                    <p class="crec-chip-valor crec-chip-valor--nd">No aplica</p>
                 @endif
             </div>
 
@@ -168,9 +172,9 @@
                             <th>IMC</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($c['historico']->sortByDesc('fecha_iso')->take(5) as $h)
-                            <tr>
+                    <tbody id="crec-historico-body">
+                        @foreach ($c['historico']->sortByDesc('fecha_iso') as $loop_index => $h)
+                            <tr @if ($loop_index >= 5) class="crec-fila-extra" style="display:none;" @endif>
                                 <td>{{ $h['fecha'] }}</td>
                                 <td>{{ $h['peso'] }}</td>
                                 <td>{{ $h['talla'] }}</td>
@@ -182,8 +186,9 @@
 
                 {{-- Botón ver más --}}
                 @if ($c['historico']->count() > 5)
-                    <button class="crec-ver-mas" id="crec-ver-mas-btn" type="button">
-                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                    <button class="crec-ver-mas" id="crec-ver-mas-btn" type="button" aria-expanded="false"
+                        aria-controls="crec-historico-body">
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
                         Ver evolución completa
                     </button>
                 @endif
@@ -476,5 +481,23 @@
             });
 
         })();
+        // Expandir y contraer el historial de controles.
+        const btnVerMas = document.getElementById('crec-ver-mas-btn');
+        const filasExtra = document.querySelectorAll('#crec-historico-body .crec-fila-extra');
+
+        if (btnVerMas && filasExtra.length) {
+            btnVerMas.addEventListener('click', function() {
+                const expandido = btnVerMas.getAttribute('aria-expanded') === 'true';
+
+                filasExtra.forEach(function(fila) {
+                    fila.style.display = expandido ? 'none' : '';
+                });
+
+                btnVerMas.setAttribute('aria-expanded', String(!expandido));
+                btnVerMas.innerHTML = expandido ?
+                    '<i class="bi bi-chevron-down" aria-hidden="true"></i> Ver evolución completa' :
+                    '<i class="bi bi-chevron-up" aria-hidden="true"></i> Mostrar menos';
+            });
+        }
     </script>
 @endif

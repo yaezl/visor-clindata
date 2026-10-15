@@ -28,7 +28,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string'],   // acepta usuario tipo "nombre.apellido"
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -46,7 +46,7 @@ class LoginRequest extends FormRequest
         // tipo "nombre.apellido". Primero intentamos por email; si no existe
         // ningún usuario con ese email, intentamos buscar por la columna `name`
         // (que almacena el nombre de usuario en nuestro sistema).
-        $credential = $this->string('email')->toString();
+        $credential = $this->string('username')->toString();
         $password   = $this->string('password')->toString();
         $remember   = $this->boolean('remember');
 
@@ -97,6 +97,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }
