@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             DiagnosticoSeeder::class,
             AntecedenteperinatalSeeder::class,
             AntecedentepatologicoSeeder::class,
+            AntecedentequirurgicoSeeder::class,
             TipoContenidoSeeder::class,
             EventohcSeeder::class,
             ConsultumSeeder::class,

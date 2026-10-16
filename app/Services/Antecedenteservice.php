@@ -8,14 +8,6 @@ use Illuminate\Support\Collection;
 /**
  * Arma los datos del tab "Antecedentes" del paciente
  * (patients/partials/antecedentes-expandable.blade.php).
- *
- * Igual que PatientSummaryService, no usa IA: toma lo que ya está
- * cargado en Antecedenteperinatal y Antecedentepatologico y lo deja
- * listo para la vista. Refleja la misma estructura que usa el
- * hospital en su historia clínica impresa: primero antecedentes
- * perinatales (cómo fue el nacimiento), después antecedentes
- * patológicos (qué le pasó antes y cómo fue, vía el texto libre de
- * 'comentario').
  */
 class AntecedenteService
 {
@@ -24,6 +16,7 @@ class AntecedenteService
         return [
             'perinatal' => $this->perinatal($persona),
             'patologicos' => $this->patologicos($persona),
+            'quirurgicos' => $this->quirurgicos($persona),
         ];
     }
 
@@ -34,7 +27,9 @@ class AntecedenteService
      */
     protected function perinatal(Persona $persona): ?array
     {
-        $antecedente = $persona->antecedenteperinatals->first();
+        $antecedente = $persona->antecedenteperinatals
+            ->sortByDesc(fn ($a) => $a->creado_en?->getTimestamp() ?? 0)
+            ->first();
 
         if (!$antecedente) {
             return null;
@@ -73,6 +68,48 @@ class AntecedenteService
                 'nombre' => $antecedente->diagnostico->nombre,
                 'comentario' => $antecedente->comentario,
             ])
+            ->values();
+    }
+
+    /**
+     * Lista de antecedentes quirúrgicos, de la cirugía más reciente a la
+     * más antigua (las que no tienen fecha cargada van al final).
+     *
+     * El nombre sale del catálogo de estudios (Estudio.nombre). Si el
+     * registro no tiene estudio asociado, se usa como título el primer
+     * renglón del comentario para que la cirugía no quede sin nombre.
+     *
+     * @return Collection<int, array{
+     *   nombre: string,
+     *   fecha: \Carbon\Carbon|null,
+     *   comentario: string|null,
+     * }>
+     */
+    protected function quirurgicos(Persona $persona): Collection
+    {
+        return $persona->antecedentequirurgicos
+            ->map(function ($antecedente) {
+                $comentario = filled($antecedente->comentario) ? trim($antecedente->comentario) : null;
+                $nombre = $antecedente->estudio?->nombre;
+
+                if (!$nombre) {
+                    if ($comentario) {
+                        // Primer renglón como título; el resto sigue siendo el comentario.
+                        $lineas = preg_split('/\r\n|\r|\n/', $comentario);
+                        $nombre = array_shift($lineas);
+                        $comentario = trim(implode("\n", $lineas)) ?: null;
+                    } else {
+                        $nombre = 'Cirugía sin especificar';
+                    }
+                }
+
+                return [
+                    'nombre' => $nombre,
+                    'fecha' => $antecedente->fecha_cirugia,
+                    'comentario' => $comentario,
+                ];
+            })
+            ->sortByDesc(fn ($item) => $item['fecha']?->getTimestamp() ?? PHP_INT_MIN)
             ->values();
     }
 }

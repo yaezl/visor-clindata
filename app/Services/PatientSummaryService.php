@@ -5,71 +5,63 @@ namespace App\Services;
 use App\Models\Persona;
 use Illuminate\Support\Collection;
 
-/**
- * Arma los datos del Resumen del paciente (tab "Resumen" en
- * patients/detail.blade.php).
- *
- * A diferencia de la Historia Clínica (que lista consulta por consulta
- * en orden cronológico), este resumen muestra información AGREGADA:
- * qué diagnósticos se repiten, si hay un patrón de consultas por una
- * misma categoría clínica, la medicación activa del paciente, y los
- * datos más relevantes de un vistazo.
- *
- * No usa IA: todo sale de queries directas sobre datos ya cargados
- * (Eventohc -> Consulta -> Consultadetalle -> DiagnosticoDetalle -> Diagnostico
- * para lo clínico, y Medicacion para el tratamiento activo).
- */
 class PatientSummaryService
 {
-    /**
-     * Cantidad mínima de diagnósticos de una misma categoría, dentro de
-     * la ventana de tiempo definida en $mesesVentanaPatron, para
-     * considerar que hay un "patrón de consultas recurrentes".
-     */
-    protected const MINIMO_PARA_PATRON = 2;
-
-    protected const MESES_VENTANA_PATRON = 6;
+    /** Cantidad máxima de diagnósticos que se listan en el bloque "más frecuentes". */
+    protected const MAX_DIAGNOSTICOS_LISTADOS = 5;
 
     public function resumenDe(Persona $persona): array
     {
-        $diagnosticos = $this->diagnosticosDelPaciente($persona);
+        $eventos = $this->eventosConConsulta($persona);
+        $diagnosticos = $this->diagnosticosDelPaciente($eventos);
 
         return [
             'diagnosticos_frecuentes' => $this->diagnosticosFrecuentes($diagnosticos),
-            'patron_categoria' => $this->detectarPatron($diagnosticos),
-            'ultima_consulta' => $this->ultimaConsultaResumen($persona),
+            'patron_categoria' => $this->detectarPatron($diagnosticos, $eventos->count()),
+            'ultima_consulta' => $this->ultimaConsultaResumen($eventos),
             'medicacion_activa' => $this->medicacionActiva($persona),
-            'cantidad_consultas_totales' => $diagnosticos->count(),
+            'cantidad_consultas' => $eventos->count(),
         ];
     }
 
     /**
-     * Trae, para este paciente, un registro por cada diagnóstico
-     * cargado en su historia, con la fecha del evento al que pertenece.
+     * Eventos de historia clínica del paciente que tienen al menos una
+     * consulta, del más reciente al más antiguo.
+     *
+     * @return Collection<int, \App\Models\Eventohc>
+     */
+    protected function eventosConConsulta(Persona $persona): Collection
+    {
+        $persona->loadMissing([
+            'eventohcs.consulta.personal.persona',
+            'eventohcs.consulta.consultadetalles.diagnostico_detalles.diagnostico',
+        ]);
+
+        return $persona->eventohcs
+            ->filter(fn ($evento) => $evento->fechahora && $evento->consulta->isNotEmpty())
+            ->sortByDesc(fn ($evento) => $evento->fechahora->getTimestamp())
+            ->values();
+    }
+
+    /**
+     * Un registro por cada diagnóstico cargado en la historia, con el id
+     * y la fecha del evento (consulta) al que pertenece. El evento_id
+     * permite contar consultas reales y no diagnósticos sueltos.
      *
      * @return Collection<int, object{
+     *   evento_id: int,
      *   diagnostico_id: int,
      *   nombre: string,
      *   categoria: string|null,
      *   fecha: \Carbon\Carbon
      * }>
      */
-    protected function diagnosticosDelPaciente(Persona $persona): Collection
+    protected function diagnosticosDelPaciente(Collection $eventos): Collection
     {
-        $eventos = $persona->eventohcs()
-            ->whereHas('consulta')
-            ->with([
-                'consulta.consultadetalles.diagnostico_detalles.diagnostico',
-            ])
-            ->orderByDesc('fechahora')
-            ->get();
-
         $filas = collect();
 
         foreach ($eventos as $evento) {
-            $consultas = $evento->consulta;
-
-            foreach ($consultas as $consulta) {
+            foreach ($evento->consulta as $consulta) {
                 foreach ($consulta->consultadetalles as $detalle) {
                     foreach ($detalle->diagnostico_detalles as $diagnosticoDetalle) {
                         $diagnostico = $diagnosticoDetalle->diagnostico;
@@ -79,6 +71,7 @@ class PatientSummaryService
                         }
 
                         $filas->push((object) [
+                            'evento_id' => $evento->id,
                             'diagnostico_id' => $diagnostico->id,
                             'nombre' => $diagnostico->nombre,
                             'categoria' => $diagnostico->categoria,
@@ -93,9 +86,9 @@ class PatientSummaryService
     }
 
     /**
-     * Agrupa por diagnóstico y cuenta ocurrencias, ordenado de más a
-     * menos frecuente. Es la sección "qué le pasa habitualmente a este
-     * paciente", en vez de repetir la evolución cronológica completa.
+     * Agrupa por diagnóstico y cuenta en cuántas consultas distintas
+     * apareció (si un diagnóstico se repite dentro de la misma consulta,
+     * cuenta una sola vez). Ordenado de más a menos frecuente.
      *
      * @return Collection<int, array{nombre: string, cantidad: int}>
      */
@@ -105,77 +98,125 @@ class PatientSummaryService
             ->groupBy('nombre')
             ->map(fn (Collection $grupo) => [
                 'nombre' => $grupo->first()->nombre,
-                'cantidad' => $grupo->count(),
+                'cantidad' => $grupo->unique('evento_id')->count(),
             ])
             ->sortByDesc('cantidad')
             ->values()
-            ->take(5);
+            ->take(self::MAX_DIAGNOSTICOS_LISTADOS);
     }
 
     /**
-     * Detecta si hay una categoría clínica (respiratorio, digestivo,
-     * etc.) con varias consultas dentro de la ventana reciente definida
-     * en MESES_VENTANA_PATRON. Es un dato neutro y calculado con una
-     * regla simple (conteo), no una inferencia clínica compleja.
+     * Detecta consultas recurrentes por categoría clínica usando solo los
+     * datos reales del paciente:
+     *
+     *  - Cuenta CONSULTAS reales por categoría (una consulta con dos
+     *    diagnósticos de la misma categoría cuenta una vez).
+     *  - Calcula el intervalo entre consultas consecutivas a partir de la
+     *    fecha de cada una, y de ahí el promedio.
+     *  - No hay ventana de meses ni mínimo arbitrario: se necesitan al
+     *    menos 2 consultas de la categoría porque con una sola no existe
+     *    intervalo que medir.
+     *
+     * Si hay varias categorías con recurrencia se informa la de más
+     * consultas y, en empate, la de consulta más reciente.
+     *
+     * @return array{
+     *   categoria: string,
+     *   cantidad: int,
+     *   total_consultas: int,
+     *   primera_fecha: \Carbon\Carbon,
+     *   ultima_fecha: \Carbon\Carbon,
+     *   intervalo_dias: int,
+     *   intervalo_texto: string,
+     *   dias_desde_ultima: int,
+     * }|null
      */
-    protected function detectarPatron(Collection $diagnosticos): ?array
+    protected function detectarPatron(Collection $diagnosticos, int $totalConsultas): ?array
     {
-        $desde = now()->subMonths(self::MESES_VENTANA_PATRON);
-
-        $categoriaMasFrecuente = $diagnosticos
-            ->filter(fn ($d) => $d->categoria && $d->fecha && $d->fecha->greaterThanOrEqualTo($desde))
+        $candidatos = $diagnosticos
+            ->filter(fn ($d) => filled($d->categoria) && $d->fecha)
             ->groupBy('categoria')
-            ->map(fn (Collection $grupo, $categoria) => [
-                'categoria' => $categoria,
-                'cantidad' => $grupo->count(),
-            ])
-            ->sortByDesc('cantidad')
-            ->first();
+            ->map(function (Collection $grupo, $categoria) {
+                $fechas = $grupo
+                    ->unique('evento_id')
+                    ->pluck('fecha')
+                    ->sortBy(fn ($fecha) => $fecha->getTimestamp())
+                    ->values();
 
-        if (!$categoriaMasFrecuente || $categoriaMasFrecuente['cantidad'] < self::MINIMO_PARA_PATRON) {
+                return [
+                    'categoria' => (string) $categoria,
+                    'fechas' => $fechas,
+                    'cantidad' => $fechas->count(),
+                    'ultima_ts' => $fechas->last()->getTimestamp(),
+                ];
+            })
+            ->filter(fn ($candidato) => $candidato['cantidad'] >= 2);
+
+        if ($candidatos->isEmpty()) {
             return null;
         }
 
+        $elegido = $candidatos
+            ->sort(fn ($a, $b) => [$b['cantidad'], $b['ultima_ts']] <=> [$a['cantidad'], $a['ultima_ts']])
+            ->first();
+
+        $fechas = $elegido['fechas'];
+        $primera = $fechas->first();
+        $ultima = $fechas->last();
+
+        // Días entre cada consulta y la siguiente, según sus fechas reales.
+        $intervalos = collect();
+        for ($i = 1; $i < $fechas->count(); $i++) {
+            $intervalos->push(abs(
+                $fechas[$i - 1]->copy()->startOfDay()->diffInDays($fechas[$i]->copy()->startOfDay())
+            ));
+        }
+
+        $intervaloDias = (int) round($intervalos->avg());
+
         return [
-            'categoria' => $categoriaMasFrecuente['categoria'],
-            'etiqueta' => $this->etiquetaCategoria($categoriaMasFrecuente['categoria']),
-            'cantidad' => $categoriaMasFrecuente['cantidad'],
-            'meses' => self::MESES_VENTANA_PATRON,
+            'categoria' => $elegido['categoria'],
+            'cantidad' => $elegido['cantidad'],
+            'total_consultas' => $totalConsultas,
+            'primera_fecha' => $primera,
+            'ultima_fecha' => $ultima,
+            'intervalo_dias' => $intervaloDias,
+            'intervalo_texto' => $this->intervaloTexto($intervaloDias),
+            'dias_desde_ultima' => (int) abs($ultima->copy()->startOfDay()->diffInDays(now()->startOfDay())),
         ];
     }
 
-    protected function etiquetaCategoria(string $categoria): string
+    /**
+     * Expresa un intervalo en días ("12 días") o, desde los 60 días, en
+     * meses ("2,5 meses") para que se lea natural.
+     */
+    protected function intervaloTexto(int $dias): string
     {
-        return match ($categoria) {
-            'respiratorio' => 'consultas respiratorias',
-            'digestivo' => 'consultas digestivas',
-            'otorrinolaringologico' => 'consultas otorrinolaringológicas',
-            'urinario' => 'consultas urinarias',
-            'control' => 'controles clínicos',
-            default => 'consultas de tipo "' . $categoria . '"',
-        };
+        if ($dias < 1) {
+            return 'menos de un día';
+        }
+
+        if ($dias < 60) {
+            return $dias . ($dias === 1 ? ' día' : ' días');
+        }
+
+        $meses = round($dias / 30.4375, 1);
+        $texto = rtrim(rtrim(number_format($meses, 1, ',', ''), '0'), ',');
+
+        return $texto . ($texto === '1' ? ' mes' : ' meses');
     }
 
-    /**
-     * Motivo y diagnóstico de la consulta más reciente, en formato
-     * corto (no repite todo el detalle largo de Consultadetalle).
-     */
-    protected function ultimaConsultaResumen(Persona $persona): ?array
+    protected function ultimaConsultaResumen(Collection $eventos): ?array
     {
-        $evento = $persona->eventohcs()
-            ->whereHas('consulta')
-            ->with([
-                'consulta.personal.persona',
-                'consulta.consultadetalles.diagnostico_detalles.diagnostico',
-            ])
-            ->orderByDesc('fechahora')
-            ->first();
+        $evento = $eventos->first();
 
         if (!$evento) {
             return null;
         }
 
-        $consulta = $evento->consulta->first();
+        $consulta = $evento->consulta
+            ->sortByDesc(fn ($c) => $c->fechahorainicio?->getTimestamp() ?? 0)
+            ->first();
         $detalle = $consulta?->consultadetalles->first();
         $diagnostico = $detalle?->diagnostico_detalles->first()?->diagnostico;
 
@@ -204,10 +245,10 @@ class PatientSummaryService
     }
 
     /**
-     * Medicación que el paciente está tomando actualmente (activa = true),
-     * con nombre, dosis y fecha de inicio. Pensado para que el médico
-     * pueda preguntar directamente por el avance de ese tratamiento sin
-     * tener que ir a buscarlo a otra pantalla.
+     * Medicación vigente (activa y no dada de baja), con nombre, dosis y
+     * fecha de inicio. Usa la relación ya cargada por PersonaService, por
+     * lo que no hace otra consulta; igual filtra por si llegara sin
+     * filtrar.
      *
      * @return Collection<int, array{
      *   nombre: string,
@@ -217,9 +258,8 @@ class PatientSummaryService
      */
     protected function medicacionActiva(Persona $persona): Collection
     {
-        return $persona->medicaciones()
-            ->where('activa', true)
-            ->get()
+        return $persona->medicaciones
+            ->filter(fn ($medicacion) => $medicacion->activa && !$medicacion->borrado_logico)
             ->map(fn ($medicacion) => [
                 'nombre' => $medicacion->nombre,
                 'dosis' => $medicacion->dosis,

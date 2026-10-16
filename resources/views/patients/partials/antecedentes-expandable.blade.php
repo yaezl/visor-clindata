@@ -3,7 +3,8 @@
     ---------------------------------------------------------------
     Se incluye desde patients/detail.blade.php.
     Recibe: $antecedentes (array armado por AntecedenteService), con
-    'perinatal' (array|null) y 'patologicos' (Collection).
+    'perinatal' (array|null), 'patologicos' (Collection) y
+    'quirurgicos' (Collection).
 --}}
 
 <div class="patient-summary-content">
@@ -65,7 +66,7 @@
     </div>
 
     {{-- Antecedentes patológicos: qué tuvo antes y cómo fue --}}
-    <div class="patient-summary-block">
+    <div class="patient-summary-block mb-4">
         <h5>Antecedentes patológicos</h5>
 
         @if ($antecedentes['patologicos']->isNotEmpty())
@@ -82,6 +83,29 @@
         @else
             <p class="patient-tab-empty">Sin antecedentes patológicos ni heredofamiliares cargados aún para este
                 paciente.</p>
+        @endif
+    </div>
+
+    {{-- Antecedentes quirúrgicos: qué cirugías tuvo y cuándo --}}
+    <div class="patient-summary-block">
+        <h5>Antecedentes quirúrgicos</h5>
+
+        @if ($antecedentes['quirurgicos']->isNotEmpty())
+            <ul class="patient-summary-list patient-summary-list--antecedente">
+                @foreach ($antecedentes['quirurgicos'] as $cirugia)
+                    <li class="patient-summary-list-item--stacked">
+                        <div class="patient-summary-med-nombre">{{ $cirugia['nombre'] }}</div>
+                        <div class="patient-summary-med-detalle">
+                            {{ $cirugia['fecha'] ? $cirugia['fecha']->format('d/m/Y') : 'Fecha no registrada' }}
+                        </div>
+                        @if ($cirugia['comentario'])
+                            <div class="patient-summary-med-detalle">{{ $cirugia['comentario'] }}</div>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p class="patient-tab-empty">Sin antecedentes quirúrgicos cargados para este paciente.</p>
         @endif
     </div>
 

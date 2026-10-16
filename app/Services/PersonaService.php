@@ -116,13 +116,29 @@ class PersonaService
             ->with(array_merge($this->relacionesBasicas, [
                 'grupo_sanguineo',
                 'plans',
-                'alergias' => fn ($query) => $query->where('activa', true),
-                'medicaciones' => fn ($query) => $query->where('activa', true),
-                'antecedentepatologicos.diagnostico',
-                'antecedenteperinatals.antec_perinatal_diagnosticos.diagnostico',
+                // Solo registros vigentes: activos y no dados de baja.
+                'alergias' => fn ($query) => $query->where('activa', true)->where('borrado_logico', false),
+                'medicaciones' => fn ($query) => $query->where('activa', true)->where('borrado_logico', false),
+                // En Alephoo antecedentepatologico.borrado_en es NOT NULL (no sirve como
+                // marca de baja); quién lo eliminó queda en eliminadopor_id (nullable).
+                'antecedentepatologicos' => fn ($query) => $query->whereNull('eliminadopor_id')->with('diagnostico'),
+                // Cirugías vigentes con el nombre del catálogo de estudios (aunque el
+                // estudio esté dado de baja en el catálogo, la cirugía ya ocurrió).
+                'antecedentequirurgicos' => fn ($query) => $query
+                    ->whereNull('eliminadopor_id')
+                    ->with(['estudio' => fn ($q) => $q->withTrashed()]),
+                'antecedenteperinatals' => fn ($query) => $query
+                    ->whereNull('borrado_en')
+                    ->whereNull('eliminadopor_id')
+                    ->with('antec_perinatal_diagnosticos.diagnostico'),
+                // Se cargan UNA sola vez con todo lo que necesitan el header y
+                // el Resumen (PatientSummaryService reutiliza esta relación).
                 'eventohcs' => function ($query) {
                     $query->whereHas('consulta')
-                        ->with(['consulta.personal.persona'])
+                        ->with([
+                            'consulta.personal.persona',
+                            'consulta.consultadetalles.diagnostico_detalles.diagnostico',
+                        ])
                         ->orderByDesc('fechahora');
                 },
             ]))
