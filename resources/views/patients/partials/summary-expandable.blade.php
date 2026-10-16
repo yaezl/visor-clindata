@@ -16,14 +16,19 @@
         <span>{{ $resumen }}</span>
     </div>
 
-    {{-- Alerta de patrón: dato neutro, calculado por conteo simple --}}
+    {{-- Consultas recurrentes por categoría: todo sale de las fechas reales de cada consulta --}}
     @if($resumen_clinico['patron_categoria'])
+        @php $patron = $resumen_clinico['patron_categoria']; @endphp
         <div class="patient-summary-pattern">
             <i class="bi bi-info-circle"></i>
             <span>
-                Presentó {{ $resumen_clinico['patron_categoria']['cantidad'] }}
-                {{ $resumen_clinico['patron_categoria']['etiqueta'] }}
-                en los últimos {{ $resumen_clinico['patron_categoria']['meses'] }} meses.
+                {{ $patron['cantidad'] }} consultas de categoría «{{ $patron['categoria'] }}»
+                (de {{ $patron['total_consultas'] }} en total),
+                entre el {{ $patron['primera_fecha']->format('d/m/Y') }}
+                y el {{ $patron['ultima_fecha']->format('d/m/Y') }}.
+                Intervalo promedio entre consultas: {{ $patron['intervalo_texto'] }}.
+                Última hace {{ $patron['dias_desde_ultima'] }}
+                {{ $patron['dias_desde_ultima'] === 1 ? 'día' : 'días' }}.
             </span>
         </div>
     @endif

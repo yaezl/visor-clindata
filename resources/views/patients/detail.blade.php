@@ -17,7 +17,13 @@
         ? "Alérgico a {$nombresAlergias->implode(', ')}. "
         : '';
 
-    $resumen = "Paciente de {$edad} en seguimiento regular. "
+    // Solo afirmaciones respaldadas por datos: edad y cantidad real de consultas.
+    $fraseConsultas = $cantidad_consultas > 0
+        ? "{$cantidad_consultas} " . ($cantidad_consultas === 1 ? 'consulta registrada' : 'consultas registradas') . '. '
+        : 'Sin consultas registradas. ';
+
+    $resumen = ($edad ? "Paciente de {$edad}. " : 'Paciente. ')
+        . $fraseConsultas
         . $fraseAlergias
         . ($tiene_medicacion_activa ? "Con medicación activa." : "Sin medicación activa.");
 
