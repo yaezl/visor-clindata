@@ -5,28 +5,32 @@ namespace App\Services;
 use App\Models\TurnoProgramado;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardService
 {
     /**
      * Devuelve los turnos programados para el día indicado (hoy por defecto),
      * con los datos de la persona y el estado_turno ya resueltos.
-     *
-     * TODO(backend): Filtrar también por el profesional logueado.
-     * Hoy `TurnoProgramado` no tiene una FK directa a `personal_id`; llega a
-     * través de `agenda.asignacion`. Cuando el vínculo Auth::user() <-> Personal
-     * de Alephoo esté definido, agregar acá:
-     *   ->whereHas('agenda.asignacion', fn ($q) => $q->where('personal_id', $personalId))
      */
     public function turnosDelDia(?Carbon $fecha = null): Collection
     {
         $fecha ??= now();
 
-        return TurnoProgramado::query()
+        $query = TurnoProgramado::query()
             ->with(['persona', 'estado_turno'])
             ->whereDate('fecha', $fecha->toDateString())
-            ->orderBy('hora')
-            ->get();
+            ->orderBy('hora');
+
+        $personalId = Auth::user()?->personal_id;
+
+        if ($personalId) {
+            $query->whereHas('agenda.asignacion', function ($q) use ($personalId) {
+                $q->where('personal_id', $personalId);
+            });
+        }
+
+        return $query->get();
     }
 
     /**

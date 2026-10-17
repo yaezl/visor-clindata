@@ -31,7 +31,7 @@
             <input
                 id="usuario"
                 name="username"
-                class="form-control @error('email') is-invalid @enderror"
+                class="form-control @error('username') is-invalid @enderror" 
                 type="text"
                 placeholder="medico.pediatra"
                 value="{{ old('username') }}"
@@ -39,7 +39,7 @@
                 autocomplete="username"
             >
 
-            @error('email')
+            @error('username')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
 
@@ -80,11 +80,12 @@
 
         </div>
 
-        <div class="text-end mb-4">
+        {{-- Eliminado: reset por email no compatible con tabla usuario --}}
+        {{-- <div class="text-end mb-4">
             <a href="{{ route('password.request') }}" class="forgot-password">
                 ¿Olvidaste tu contraseña?
             </a>
-        </div>
+        </div> --}}
 
         <button class="btn btn-primary w-100 login-button" type="submit">
             Iniciar Sesión
