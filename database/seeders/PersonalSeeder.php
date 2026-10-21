@@ -270,6 +270,37 @@ class PersonalSeeder extends Seeder
                 'modified_by' => $usuarioId,
             ]);
         }
+        
+        // Crear usuarios en tabla `usuario` para cada médico tratante
+        $medicosTratantesDocumentos = self::DOCUMENTOS_MEDICOS_TRATANTES;
 
+        $personasTratantes = Persona::whereIn('documento', $medicosTratantesDocumentos)->get();
+
+        foreach ($personasTratantes as $persona) {
+            $personal = Personal::where('persona_id', $persona->id)->first();
+
+            if (! $personal) {
+                continue;
+            }
+
+            $username = strtolower($persona->nombres) . '.' . strtolower($persona->apellidos);
+            // Reemplazar espacios y tildes comunes
+            $username = str_replace(
+                ['á', 'é', 'í', 'ó', 'ú', 'ñ', ' '],
+                ['a', 'e', 'i', 'o', 'u', 'n', '.'],
+                $username
+            );
+
+            $existe = DB::table('usuario')->where('username', $username)->first();
+            if (! $existe) {
+                DB::statement(
+                    "INSERT INTO usuario (username, password, created_at, created_by, updated_at, modified_by,
+                                  deleted_at, deleted_by, personal_id, borrado_logico,
+                                  last_login, log_attempt, blocked_account, codigo_ad_hoc, cambiar_password)
+             VALUES (?, ?, NOW(), 1, NOW(), 1, NULL, NULL, ?, 0, NULL, 0, 0, NULL, 0)",
+                    [$username, bcrypt('password'), $personal->id]
+                );
+            }
+        }
     }
 }

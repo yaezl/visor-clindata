@@ -42,27 +42,14 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // El campo se llama "email" en el form pero puede contener un username
-        // tipo "nombre.apellido". Primero intentamos por email; si no existe
-        // ningún usuario con ese email, intentamos buscar por la columna `name`
-        // (que almacena el nombre de usuario en nuestro sistema).
-        $credential = $this->string('username')->toString();
-        $password   = $this->string('password')->toString();
-        $remember   = $this->boolean('remember');
-
-        // Intento 1: el valor ingresado ES un e-mail
-        if (str_contains($credential, '@')) {
-            $authenticated = Auth::attempt(['email' => $credential, 'password' => $password], $remember);
-        } else {
-            // Intento 2: buscar por el campo `name` (username tipo "nombre.apellido")
-            $authenticated = Auth::attempt(['name' => $credential, 'password' => $password], $remember);
-        }
-
-        if (! $authenticated) {
+        if (! Auth::attempt(
+            ['username' => $this->string('username'), 'password' => $this->string('password')],
+            $this->boolean('remember')
+        )) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'username' => trans('auth.failed'),
             ]);
         }
 
@@ -85,7 +72,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'username' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -97,6 +84,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')) . '|' . $this->ip());
     }
 }

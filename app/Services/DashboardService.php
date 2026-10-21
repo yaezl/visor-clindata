@@ -3,30 +3,65 @@
 namespace App\Services;
 
 use App\Models\TurnoProgramado;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardService
 {
     /**
+     * Query base de turnos, ya restringida al médico autenticado.
+     *
+     * Toda lectura de turnos (dashboard, calendario, contadores) debe partir
+     * de acá para que el filtro por médico no se pueda olvidar en un lugar.
+     * Cadena: usuario.personal_id → asignacion.personal_id → agenda → turno_programado.
+     *
+     * Si el usuario no está vinculado a un personal (p. ej. el usuario genérico
+     * "medico.pediatra"), no se filtra y ve todos los turnos.
+     */
+    public function turnosQuery(): Builder
+    {
+        $query = TurnoProgramado::query();
+
+        $personalId = Auth::user()?->personal_id;
+
+        if ($personalId) {
+            $query->whereHas('agenda.asignacion', function ($q) use ($personalId) {
+                $q->where('personal_id', $personalId);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
      * Devuelve los turnos programados para el día indicado (hoy por defecto),
      * con los datos de la persona y el estado_turno ya resueltos.
-     *
-     * TODO(backend): Filtrar también por el profesional logueado.
-     * Hoy `TurnoProgramado` no tiene una FK directa a `personal_id`; llega a
-     * través de `agenda.asignacion`. Cuando el vínculo Auth::user() <-> Personal
-     * de Alephoo esté definido, agregar acá:
-     *   ->whereHas('agenda.asignacion', fn ($q) => $q->where('personal_id', $personalId))
      */
     public function turnosDelDia(?Carbon $fecha = null): Collection
     {
         $fecha ??= now();
 
-        return TurnoProgramado::query()
+        return $this->turnosQuery()
             ->with(['persona', 'estado_turno'])
             ->whereDate('fecha', $fecha->toDateString())
             ->orderBy('hora')
             ->get();
+    }
+
+    /**
+     * Cantidad de turnos por día (clave 'Y-m-d') entre dos fechas, solo del
+     * médico autenticado. Alimenta los indicadores del calendario.
+     */
+    public function conteoPorDia(Carbon $desde, Carbon $hasta): array
+    {
+        return $this->turnosQuery()
+            ->whereBetween('fecha', [$desde->copy()->startOfDay(), $hasta->copy()->endOfDay()])
+            ->selectRaw('DATE(fecha) as fecha_dia, COUNT(*) as total')
+            ->groupByRaw('DATE(fecha)')
+            ->pluck('total', 'fecha_dia')
+            ->toArray();
     }
 
     /**

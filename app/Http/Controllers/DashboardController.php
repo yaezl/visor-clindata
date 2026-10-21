@@ -81,20 +81,12 @@ class DashboardController extends Controller
         }
 
         try {
-            // Cantidad de turnos por día para los indicadores de la grilla.
-            $turnosMes = \App\Models\TurnoProgramado::query()
-                ->whereBetween('fecha', [$inicioMes->copy()->startOfDay(), $finMes->copy()->endOfDay()])
-                ->selectRaw('DATE(fecha) as fecha_dia, COUNT(*) as total')
-                ->groupByRaw('DATE(fecha)')
-                ->pluck('total', 'fecha_dia')
-                ->toArray();
+            // Cantidad de turnos por día para los indicadores de la grilla
+            // (solo los del médico autenticado).
+            $turnosMes = $this->dashboardService->conteoPorDia($inicioMes, $finMes);
 
-            // Detalle de los turnos del día seleccionado.
-            $turnosDelDia = \App\Models\TurnoProgramado::query()
-                ->with('persona')
-                ->whereDate('fecha', $fechaSeleccionada->toDateString())
-                ->orderBy('hora')
-                ->get();
+            // Detalle de los turnos del día seleccionado (mismo filtro).
+            $turnosDelDia = $this->dashboardService->turnosDelDia($fechaSeleccionada);
         } catch (\Illuminate\Database\QueryException $e) {
             \Log::error('Calendario QueryException: ' . $e->getMessage());
             $turnosMes = [];
