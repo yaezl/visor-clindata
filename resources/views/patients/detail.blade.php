@@ -1,60 +1,10 @@
 {{--
     Vista de Detalle de Paciente
     ----------------------------
-    Datos reales conectados vía PersonaController@detail -> PersonaService@buscarParaDetalle.
-
-    Los 4 bloques (Resumen, Antecedentes, Vacunación, Control de
-    crecimiento) son acordeones idénticos en look & feel. El contenido
-    de cada uno vive en su propio partial bajo patients/partials/, para
-    poder editarlos sin tocar este archivo.
+    El header se carga sincrónicamente (liviano: sin eventohcs ni antecedentes).
+    Los 4 paneles se cargan lazy vía fetch cuando el usuario los abre por
+    primera vez — cada uno tiene su propia ruta en web.php.
 --}}
-
-@php
-    // Resumen generado por plantilla:  concatenación de datos reales.
-    $nombresAlergias = $alergias->pluck('nombre');
-
-    $fraseAlergias = $nombresAlergias->isNotEmpty()
-        ? "Alérgico a {$nombresAlergias->implode(', ')}. "
-        : '';
-
-    // Solo afirmaciones respaldadas por datos: edad y cantidad real de consultas.
-    $fraseConsultas = $cantidad_consultas > 0
-        ? "{$cantidad_consultas} " . ($cantidad_consultas === 1 ? 'consulta registrada' : 'consultas registradas') . '. '
-        : 'Sin consultas registradas. ';
-
-    $resumen = ($edad ? "Paciente de {$edad}. " : 'Paciente. ')
-        . $fraseConsultas
-        . $fraseAlergias
-        . ($tiene_medicacion_activa ? "Con medicación activa." : "Sin medicación activa.");
-
-    // Cada acordeón: id, icono, título y el partial que renderiza su contenido.
-    $acordeones = [
-        [
-            'id' => 'resumen',
-            'icono' => 'bi-clipboard2-pulse',
-            'titulo' => 'Resumen',
-            'partial' => 'patients.partials.summary-expandable',
-        ],
-        [
-            'id' => 'antecedentes',
-            'icono' => 'bi-journal-medical',
-            'titulo' => 'Antecedentes',
-            'partial' => 'patients.partials.antecedentes-expandable',
-        ],
-        [
-            'id' => 'vacunacion',
-            'icono' => 'bi-shield-plus',
-            'titulo' => 'Vacunación',
-            'partial' => 'patients.partials.vacunacion-expandable',
-        ],
-        [
-            'id' => 'crecimiento',
-            'icono' => 'bi-graph-up-arrow',
-            'titulo' => 'Control de crecimiento',
-            'partial' => 'patients.partials.crecimiento-expandable',
-        ],
-    ];
-@endphp
 
 <x-app-layout>
 
@@ -134,7 +84,36 @@
 
     </div>
 
-    {{-- ── 4 acordeones: Resumen, Antecedentes, Vacunación, Crecimiento ── --}}
+    {{-- ── 4 acordeones con carga lazy ────────────────────────────── --}}
+    @php
+        $acordeones = [
+            [
+                'id'    => 'resumen',
+                'icono' => 'bi-clipboard2-pulse',
+                'titulo' => 'Resumen',
+                'url'   => route('patients.panel.resumen', $persona->id),
+            ],
+            [
+                'id'    => 'antecedentes',
+                'icono' => 'bi-journal-medical',
+                'titulo' => 'Antecedentes',
+                'url'   => route('patients.panel.antecedentes', $persona->id),
+            ],
+            [
+                'id'    => 'vacunacion',
+                'icono' => 'bi-shield-plus',
+                'titulo' => 'Vacunación',
+                'url'   => route('patients.panel.vacunacion', $persona->id),
+            ],
+            [
+                'id'    => 'crecimiento',
+                'icono' => 'bi-graph-up-arrow',
+                'titulo' => 'Control de crecimiento',
+                'url'   => route('patients.panel.crecimiento', $persona->id),
+            ],
+        ];
+    @endphp
+
     @foreach($acordeones as $acordeon)
 
         <button
@@ -142,38 +121,76 @@
             class="patient-summary-toggle"
             id="toggle-{{ $acordeon['id'] }}"
             data-target="panel-{{ $acordeon['id'] }}"
+            data-url="{{ $acordeon['url'] }}"
             aria-expanded="false"
             aria-controls="panel-{{ $acordeon['id'] }}"
         >
             <i class="bi {{ $acordeon['icono'] }}"></i>
             {{ $acordeon['titulo'] }}
-            <i class="bi bi-chevron-down"></i>
+            <i class="bi bi-chevron-down toggle-chevron"></i>
         </button>
 
         <div class="patient-summary-panel" id="panel-{{ $acordeon['id'] }}">
-            @include($acordeon['partial'])
+            {{-- El contenido se inyecta vía fetch al primer clic --}}
         </div>
 
     @endforeach
 
-    {{-- ── Scripts: acordeones (vanilla JS, sin dependencias) ──────── --}}
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
         const toggles = document.querySelectorAll('.patient-summary-toggle');
 
         toggles.forEach(toggle => {
-            const panel = document.getElementById(toggle.dataset.target);
+            const panel  = document.getElementById(toggle.dataset.target);
+            const url    = toggle.dataset.url;
+            let cargado  = false;
 
-            if (!panel) {
-                return;
-            }
+            if (!panel) return;
 
-            toggle.addEventListener('click', () => {
+            toggle.addEventListener('click', async () => {
                 const abierto = panel.classList.toggle('open');
 
                 toggle.classList.toggle('active', abierto);
                 toggle.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+
+                // Cargar contenido solo la primera vez que se abre
+                if (abierto && !cargado) {
+                    panel.innerHTML = `
+                        <div class="panel-loading">
+                            <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                            <span>Cargando...</span>
+                        </div>`;
+
+                    try {
+                        const res  = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                        panel.innerHTML = await res.text();
+                        cargado = true;
+
+                        // Re-inicializar scripts dentro del panel si los hay
+                        // (por ejemplo, los gráficos de crecimiento)
+                        panel.querySelectorAll('script').forEach(oldScript => {
+                            const newScript = document.createElement('script');
+                            newScript.textContent = oldScript.textContent;
+                            oldScript.replaceWith(newScript);
+                        });
+
+                    } catch (err) {
+                        panel.innerHTML = `
+                            <div class="panel-error">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                No se pudo cargar el panel. Intentá de nuevo.
+                                <button class="btn btn-sm btn-link" onclick="this.closest('.patient-summary-panel').previousElementSibling.click(); this.closest('.patient-summary-panel').previousElementSibling.click();">
+                                    Reintentar
+                                </button>
+                            </div>`;
+                    }
+                }
             });
         });
 

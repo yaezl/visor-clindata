@@ -231,7 +231,7 @@ class PersonaService
      * a "0 años", que no dice nada útil al médico. Mostramos en meses
      * hasta que cumplan el año, y en años a partir de ahí.
      */
-    protected function edadFormateada(?\Illuminate\Support\Carbon $fechaNacimiento): ?string
+    public function edadFormateada(?\Illuminate\Support\Carbon $fechaNacimiento): ?string
     {
         if (!$fechaNacimiento) {
             return null;
@@ -260,5 +260,73 @@ class PersonaService
         $inicialApellido = mb_substr($persona->apellidos ?? '', 0, 1);
 
         return mb_strtoupper($inicialNombre . $inicialApellido);
+    }
+
+    // ── Métodos de carga focalizada para paneles lazy ─────────────────────
+
+    /**
+     * Carga mínima: solo datos de persona, sin relaciones.
+     * Suficiente para VacunacionService (solo necesita fecha_nacimiento y sexo).
+     */
+    public function buscarBasico(int $id): Persona
+    {
+        return Persona::findOrFail($id);
+    }
+
+    /**
+     * Carga persona con eventohcs y sus relaciones anidadas.
+     * Usado por panelResumen → PatientSummaryService.
+     */
+    public function buscarConEventos(int $id): Persona
+    {
+        return Persona::query()
+            ->with([
+                'alergias' => fn($q) => $q->where('activa', true)->where('borrado_logico', false),
+                'medicaciones' => fn($q) => $q->where('activa', true)->where('borrado_logico', false),
+                'eventohcs' => function ($q) {
+                    $q->whereHas('consulta')
+                        ->with([
+                            'consulta.personal.persona',
+                            'consulta.consultadetalles.diagnostico_detalles.diagnostico',
+                        ])
+                        ->orderByDesc('fechahora');
+                },
+            ])
+            ->findOrFail($id);
+    }
+
+    /**
+     * Carga persona con antecedentes patológicos, quirúrgicos y perinatales.
+     * Usado por panelAntecedentes → AntecedenteService.
+     */
+    public function buscarConAntecedentes(int $id): Persona
+    {
+        return Persona::query()
+            ->with([
+                'antecedentepatologicos' => fn($q) => $q->whereNull('eliminadopor_id')->with('diagnostico'),
+                'antecedentequirurgicos' => fn($q) => $q
+                    ->whereNull('eliminadopor_id')
+                    ->with(['estudio' => fn($q) => $q->withTrashed()]),
+                'antecedenteperinatals' => fn($q) => $q
+                    ->whereNull('borrado_en')
+                    ->whereNull('eliminadopor_id')
+                    ->with('antec_perinatal_diagnosticos.diagnostico'),
+            ])
+            ->findOrFail($id);
+    }
+
+    /**
+     * Carga persona con mediciones antropométricas y antecedente perinatal.
+     * Usado por panelCrecimiento → CrecimientoService.
+     */
+    public function buscarConMediciones(int $id): Persona
+    {
+        return Persona::query()
+            ->with([
+                'antecedenteperinatals' => fn($q) => $q
+                    ->whereNull('borrado_en')
+                    ->whereNull('eliminadopor_id'),
+            ])
+            ->findOrFail($id);
     }
 }
