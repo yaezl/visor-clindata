@@ -29,7 +29,14 @@ class PersonaController extends Controller
     public function index(Request $request): View|JsonResponse
     {
         $q       = (string) $request->input('q', '');
-        $filtros   = $request->only(['sexo', 'edad_desde', 'edad_hasta', 'obra_social']);
+        $filtros   = $request->only([
+            'sexo',
+            'edad_desde',
+            'edad_hasta',
+            'obra_social',
+            'grupo_sanguineo',
+            'es_cronico',
+        ]);
 
         try {
             $personas = $this->personaService
@@ -49,7 +56,10 @@ class PersonaController extends Controller
             return response()->json($personas);
         }
 
-        return view('patients.index', compact('personas'));
+        $gruposSanguineos = $this->personaService->gruposSanguineos();
+        $obrasSociales    = $this->personaService->obrasSocialesConPacientes();
+
+        return view('patients.index', compact('personas', 'gruposSanguineos', 'obrasSociales'));
     }
 
     public function show(Request $request, int $id): View|JsonResponse

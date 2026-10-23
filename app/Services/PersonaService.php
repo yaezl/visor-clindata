@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\GrupoSanguineo;
+use App\Models\ObraSocial;
 use App\Models\Persona;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -62,20 +64,67 @@ class PersonaService
         }
 
         // ── Filtro por obra social / financiador ─────────────────────────
-        // La relación depende del modelo Cobertura / Plan. Si la tabla no existe
-        // en este entorno, el filtro se ignora silenciosamente.
+        // Busca por nombre en la tabla obra_social a través de la relación
+        // persona → persona_plan → plan → obra_social.
         if (!empty($filtros['obra_social'])) {
-            $likeOs = '%' . $filtros['obra_social'] . '%';
             try {
-                $query->whereHas('personas_plan.plan.obra_social', function ($sub) use ($likeOs) {
-                    $sub->where('nombre', 'like', $likeOs);
+                $query->whereHas('plans.obra_social', function ($sub) use ($filtros) {
+                    $sub->where('id', (int) $filtros['obra_social'])
+                        ->where('borrado_logico', false);
                 });
             } catch (\Throwable) {
                 // La relación no existe en este entorno; ignoramos el filtro.
             }
         }
 
+        // ── Filtro por grupo sanguíneo ───────────────────────────────────
+        if (!empty($filtros['grupo_sanguineo'])) {
+            $query->where('grupo_sanguineo_id', (int) $filtros['grupo_sanguineo']);
+        }
+
+        // ── Filtro por paciente crónico ──────────────────────────────────
+        if (isset($filtros['es_cronico']) && $filtros['es_cronico'] !== '') {
+            $query->where('es_cronico', (bool) $filtros['es_cronico']);
+        }
+
         return $query->orderBy('apellidos')->paginate($porPagina)->withQueryString();
+    }
+
+    // ── Datos para los selects del panel de filtros ──────────────────────
+
+    /**
+     * Devuelve los grupos sanguíneos ordenados por código.
+     * Retorna colección vacía si la tabla no existe en el entorno.
+     */
+    public function gruposSanguineos(): \Illuminate\Support\Collection
+    {
+        try {
+            return GrupoSanguineo::query()
+                ->where('borrado_logico', false)
+                ->orderBy('codigo')
+                ->get(['id', 'codigo']);
+        } catch (\Throwable) {
+            return collect();
+        }
+    }
+
+    /**
+     * Devuelve las obras sociales que tienen al menos un plan asignado a
+     * algún paciente, ordenadas por nombre. Evita listados enormes con
+     * financiadores que nunca se usaron.
+     * Retorna colección vacía si la relación no existe en el entorno.
+     */
+    public function obrasSocialesConPacientes(): \Illuminate\Support\Collection
+    {
+        try {
+            return ObraSocial::query()
+                ->whereHas('plans.personas')
+                ->where('borrado_logico', false)
+                ->orderBy('nombre')
+                ->get(['id', 'nombre']);
+        } catch (\Throwable) {
+            return collect();
+        }
     }
 
     /**
@@ -115,19 +164,19 @@ class PersonaService
         $persona = Persona::query()
             ->with(array_merge($this->relacionesBasicas, [
                 'grupo_sanguineo',
-                'plans',
+                'plans.obra_social',
                 // Solo registros vigentes: activos y no dados de baja.
-                'alergias' => fn ($query) => $query->where('activa', true)->where('borrado_logico', false),
-                'medicaciones' => fn ($query) => $query->where('activa', true)->where('borrado_logico', false),
+                'alergias' => fn($query) => $query->where('activa', true)->where('borrado_logico', false),
+                'medicaciones' => fn($query) => $query->where('activa', true)->where('borrado_logico', false),
                 // En Alephoo antecedentepatologico.borrado_en es NOT NULL (no sirve como
                 // marca de baja); quién lo eliminó queda en eliminadopor_id (nullable).
-                'antecedentepatologicos' => fn ($query) => $query->whereNull('eliminadopor_id')->with('diagnostico'),
+                'antecedentepatologicos' => fn($query) => $query->whereNull('eliminadopor_id')->with('diagnostico'),
                 // Cirugías vigentes con el nombre del catálogo de estudios (aunque el
                 // estudio esté dado de baja en el catálogo, la cirugía ya ocurrió).
-                'antecedentequirurgicos' => fn ($query) => $query
+                'antecedentequirurgicos' => fn($query) => $query
                     ->whereNull('eliminadopor_id')
-                    ->with(['estudio' => fn ($q) => $q->withTrashed()]),
-                'antecedenteperinatals' => fn ($query) => $query
+                    ->with(['estudio' => fn($q) => $q->withTrashed()]),
+                'antecedenteperinatals' => fn($query) => $query
                     ->whereNull('borrado_en')
                     ->whereNull('eliminadopor_id')
                     ->with('antec_perinatal_diagnosticos.diagnostico'),
@@ -177,7 +226,7 @@ class PersonaService
         ];
     }
 
-   /**
+    /**
      * Para bebés (menores de 1 año) mostrar la edad en años redondea
      * a "0 años", que no dice nada útil al médico. Mostramos en meses
      * hasta que cumplan el año, y en años a partir de ahí.

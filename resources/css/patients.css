@@ -1,8 +1,12 @@
-/* ── Search Bar ─────────────────────────────────── */
+
+/* ==================================================
+   BARRA DE BÚSQUEDA
+   ================================================== */
+
 .search-form {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 12px;
 }
 
 .search-input-wrapper {
@@ -12,39 +16,35 @@
 
 .search-icon {
     position: absolute;
-    left: 16px;
     top: 50%;
+    left: 16px;
     transform: translateY(-50%);
     color: var(--hu-text-secondary);
     font-size: 1rem;
     pointer-events: none;
 }
 
-#searchInput, .search-input {
+#searchInput,
+.search-input {
+    height: 48px;
     padding-left: 48px !important;
+    border: 1px solid var(--hu-border);
     border-radius: 16px;
     background: var(--hu-surface);
-    border: 1px solid var(--hu-border);
     font-size: .95rem;
-    height: 48px;
-}
-
-.search-input:focus {
-    border-color: var(--hu-primary);
-    box-shadow: 0 0 0 .15rem rgba(0, 55, 100, .12);
 }
 
 #botonFiltros {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    border: 1px solid var(--hu-border);
-    background: var(--hu-surface);
-    color: var(--hu-text-secondary);
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--hu-border);
+    border-radius: 14px;
+    background: var(--hu-surface);
+    color: var(--hu-text-secondary);
     transition: var(--transition);
 }
 
@@ -53,55 +53,72 @@
     color: var(--hu-primary);
 }
 
-/* ── Results label ──────────────────────────────── */
+
+/* ==================================================
+   RESULTADOS DE BÚSQUEDA
+   ================================================== */
+
 .search-results-label {
-    font-size: .9rem;
     color: var(--hu-text-secondary);
+    font-size: .9rem;
 }
 
 .search-results-label strong {
     color: var(--hu-text);
 }
 
-/* ── Filter chips (filtros activos) ─────────────── */
+#patientsResults {
+    transition: opacity .15s ease;
+}
+
+#patientsResults.search-results-loading {
+    opacity: .58;
+}
+
+
+/* ==================================================
+   CHIPS DE FILTROS ACTIVOS
+   ================================================== */
+
 .filter-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: #E8EFF8;
-    color: var(--hu-primary);
+    margin: 0 2px;
+    padding: 2px 10px;
     border: 1px solid #BDD0E8;
     border-radius: 999px;
-    padding: 2px 10px;
+    background: #E8EFF8;
+    color: var(--hu-primary);
     font-size: .8rem;
     font-weight: 500;
-    margin: 0 2px;
 }
 
 .filter-chip-remove {
+    display: flex;
+    align-items: center;
     color: var(--hu-primary);
     opacity: .6;
     text-decoration: none;
-    display: flex;
-    align-items: center;
     transition: opacity var(--transition);
 }
 
 .filter-chip-remove:hover {
-    opacity: 1;
     color: var(--hu-danger);
+    opacity: 1;
 }
 
-/* ══════════════════════════════════════════════════
-   Panel de filtros — drawer lateral derecho
-   ══════════════════════════════════════════════════ */
 
-/* Overlay semitransparente */
+/* ==================================================
+   PANEL LATERAL DE FILTROS
+   ================================================== */
+
+/* Overlay */
 .filtros-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, .35);
     z-index: 1040;
+    background: rgba(0, 0, 0, .35);
     opacity: 0;
     pointer-events: none;
     transition: opacity .25s ease;
@@ -112,18 +129,18 @@
     pointer-events: all;
 }
 
-/* El panel en sí */
+/* Panel */
 .filtros-panel {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    width: 340px;
-    max-width: 90vw;
-    background: var(--hu-surface);
     z-index: 1050;
     display: flex;
     flex-direction: column;
+    width: 340px;
+    max-width: 90vw;
+    background: var(--hu-surface);
     box-shadow: -6px 0 24px rgba(0, 0, 0, .12);
     transform: translateX(100%);
     transition: transform .28s cubic-bezier(.4, 0, .2, 1);
@@ -133,35 +150,40 @@
     transform: translateX(0);
 }
 
-/* Header del panel */
+
+/* ==================================================
+   ENCABEZADO DEL PANEL
+   ================================================== */
+
 .filtros-header {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
     border-bottom: 1px solid var(--hu-border);
-    flex-shrink: 0;
 }
 
 .filtros-title {
+    margin: 0;
+    color: var(--hu-text);
     font-size: 1.05rem;
     font-weight: 700;
-    color: var(--hu-text);
-    margin: 0;
 }
 
 .filtros-close {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid var(--hu-border);
-    background: transparent;
-    color: var(--hu-text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--hu-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--hu-text-secondary);
     cursor: pointer;
-    transition: border-color var(--transition), color var(--transition);
+    transition: border-color var(--transition),
+                color var(--transition);
 }
 
 .filtros-close:hover {
@@ -169,17 +191,20 @@
     color: var(--hu-primary);
 }
 
-/* Cuerpo scrollable */
+
+/* ==================================================
+   CUERPO Y GRUPOS DE FILTROS
+   ================================================== */
+
 .filtros-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: 28px;
+    overflow-y: auto;
+    padding: 24px;
 }
 
-/* Grupo de filtro */
 .filtro-grupo {
     display: flex;
     flex-direction: column;
@@ -187,49 +212,56 @@
 }
 
 .filtro-label {
+    margin: 0;
+    color: var(--hu-text-secondary);
     font-size: .82rem;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: .07em;
-    color: var(--hu-text-secondary);
-    margin: 0;
+    text-transform: uppercase;
 }
 
 .filtro-sublabel {
-    font-size: .8rem;
-    color: var(--hu-text-secondary);
-    margin-bottom: 4px;
     display: block;
+    margin-bottom: 4px;
+    color: var(--hu-text-secondary);
+    font-size: .8rem;
 }
 
-/* Radio buttons estilizados como chips */
+
+/* ==================================================
+   OPCIONES DE FILTROS
+   ================================================== */
+
+/* Radio buttons como chips */
 .filtro-opciones-row {
     display: flex;
     gap: 10px;
 }
 
 .filtro-radio-label {
-    flex: 1;
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     gap: 6px;
     padding: 9px 12px;
     border: 1.5px solid var(--hu-border);
     border-radius: 12px;
-    cursor: pointer;
+    color: var(--hu-text-secondary);
     font-size: .9rem;
     font-weight: 500;
-    color: var(--hu-text-secondary);
-    transition: border-color var(--transition), color var(--transition), background var(--transition);
+    cursor: pointer;
     user-select: none;
+    transition: border-color var(--transition),
+                color var(--transition),
+                background var(--transition);
 }
 
 .filtro-radio-label input[type="radio"] {
     position: absolute;
-    opacity: 0;
     width: 0;
     height: 0;
+    opacity: 0;
 }
 
 .filtro-radio-label:hover {
@@ -244,7 +276,24 @@
     font-weight: 600;
 }
 
-/* Rango de edad */
+/* Grupos sanguíneos */
+.filtro-opciones-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.filtro-radio-compact {
+    justify-content: center;
+    padding: 7px 4px;
+    font-size: .85rem;
+}
+
+
+/* ==================================================
+   RANGO DE EDAD
+   ================================================== */
+
 .filtro-rango-row {
     display: flex;
     align-items: flex-end;
@@ -261,55 +310,66 @@
     font-size: 1.1rem;
 }
 
-.filtro-input-num {
-    border-radius: 12px;
+
+/* ==================================================
+   CAMPOS DE ENTRADA
+   ================================================== */
+
+/* Estilos compartidos por los campos de filtros */
+.filtro-input-num,
+.filtro-input-text {
     border: 1.5px solid var(--hu-border);
+    border-radius: 12px;
     font-size: .9rem;
+}
+
+.filtro-input-num {
     height: 42px;
     text-align: center;
 }
 
-.filtro-input-num:focus {
-    border-color: var(--hu-primary);
-    box-shadow: 0 0 0 .15rem rgba(0, 55, 100, .12);
-}
-
-/* Obra social text input */
 .filtro-input-text {
-    border-radius: 12px;
-    border: 1.5px solid var(--hu-border);
-    font-size: .9rem;
     height: 42px;
 }
 
+/* Foco de los campos */
+#searchInput:focus,
+.search-input:focus,
+.filtro-input-num:focus,
 .filtro-input-text:focus {
     border-color: var(--hu-primary);
     box-shadow: 0 0 0 .15rem rgba(0, 55, 100, .12);
 }
 
-/* Acciones del panel */
+
+/* ==================================================
+   ACCIONES DEL PANEL
+   ================================================== */
+
 .filtros-actions {
-    margin-top: auto;
     display: flex;
     gap: 10px;
+    margin-top: auto;
     padding-top: 8px;
     border-top: 1px solid var(--hu-border);
 }
 
+/* Botón limpiar */
 .filtros-btn-limpiar {
-    flex: 1;
-    height: 44px;
-    border-radius: 12px;
-    border: 1.5px solid var(--hu-border);
-    background: transparent;
-    color: var(--hu-text-secondary);
-    font-weight: 500;
-    font-size: .9rem;
-    text-decoration: none;
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
-    transition: border-color var(--transition), color var(--transition);
+    height: 44px;
+    border: 1.5px solid var(--hu-border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--hu-text-secondary);
+    font-size: .9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color var(--transition),
+                color var(--transition);
 }
 
 .filtros-btn-limpiar:hover {
@@ -317,28 +377,37 @@
     color: var(--hu-danger);
 }
 
+/* Botón aplicar */
 .filtros-btn-aplicar {
     flex: 1;
     height: 44px;
+    border: 1.5px solid var(--hu-border);
     border-radius: 12px;
-    background: var(--hu-primary);
-    border: none;
-    color: #fff;
-    font-weight: 600;
+    background: var(--hu-primary) !important;
+    color: var(--hu-surface) !important;
     font-size: .9rem;
-    transition: background var(--transition);
+    font-weight: 500;
+    transition: border-color var(--transition),
+                color var(--transition),
+                background var(--transition);
 }
 
 .filtros-btn-aplicar:hover {
-    background: var(--hu-primary-hover);
+    background: var(--hu-primary-hover) !important;
+}
+
+/* Variante primaria */
+.filtros-btn-aplicar--primary {
+    border-color: var(--hu-primary);
+    background: var(--hu-primary);
     color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 55, 100, .20);
 }
 
-/* Estado de carga de la búsqueda dinámica de pacientes */
-#patientsResults {
-    transition: opacity .15s ease;
-}
-
-#patientsResults.search-results-loading {
-    opacity: .58;
+.filtros-btn-aplicar--primary:hover {
+    border-color: var(--hu-primary-hover, #002f5a);
+    background: var(--hu-primary-hover, #002f5a);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 55, 100, .28);
 }

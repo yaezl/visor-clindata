@@ -10,14 +10,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Usuario principal — se puede ingresar con:
-        //   · email:    medico@clindata.com  / password
-        //   · usuario:  medico.pediatra      / password  (busca por columna `name`)
-        // El `name` actúa como username (login); la topbar mostrará "Hola, Médico Pediatra"
-        // solo si el controlador/topbar usa el campo `name` formateado. Para que la
-        // topbar muestre un nombre legible, guardamos el nombre de usuario en `name`
-        // y el nombre real se mostraría desde Personal/Persona si estuviera vinculado.
-        // Por ahora ajustamos el `name` a algo presentable.
+        // Usuario para pruebas de login. Es viejo, ahora no se usa la tabla User, sino Usuario
         User::updateOrCreate(
             ['email' => 'medico@clindata.com'],
             [
@@ -26,11 +19,19 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Ejecutamos los demás seeders
         $this->call([
             PersonalSeeder::class,
             GrupoSanguineoSeeder::class,
             PersonaSeeder::class,
+
+            // Obras sociales, planes y sus catálogos de FK (TipoBeneficiario,
+            // TipoParentesco). Debe ir ANTES de PersonaPlanSeeder.
+            ObraSocialSeeder::class,
+
+            // Asigna obras sociales a los pacientes y marca crónicos.
+            // Depende de PersonaSeeder y ObraSocialSeeder.
+            PersonaPlanSeeder::class,
+
             TurnoProgramadoSeeder::class,
             DiagnosticoSeeder::class,
             AntecedenteperinatalSeeder::class,

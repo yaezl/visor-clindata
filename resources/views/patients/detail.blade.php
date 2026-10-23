@@ -84,6 +84,8 @@
                         <span>{{ $persona->sexo === 'M' ? 'Masculino' : ($persona->sexo === 'F' ? 'Femenino' : ($persona->sexo ?? '—')) }}</span>
                         <span class="dot"></span>
                         <span class="blood-badge">{{ $grupo_sanguineo ?? '—' }}</span>
+                        <span class="dot"></span>
+                        <span>{{ $persona->plans->first()?->obra_social?->nombre ?? '—' }}</span>
                     </div>
                 </div>
 
