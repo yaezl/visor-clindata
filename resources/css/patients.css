@@ -43,14 +43,15 @@
     height: 48px;
     border: 1px solid var(--hu-border);
     border-radius: 14px;
-    background: var(--hu-surface);
-    color: var(--hu-text-secondary);
+    background: var(--hu-primary);
+    color: var(--hu-surface);
     transition: var(--transition);
 }
 
 #botonFiltros:hover {
-    border-color: var(--hu-primary);
     color: var(--hu-primary);
+    background: var(--hu-surface);
+    border-color: var(--hu-primary);
 }
 
 
@@ -356,40 +357,40 @@
 
 /* Botón limpiar */
 .filtros-btn-limpiar {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    height: 44px;
-    border: 1.5px solid var(--hu-border);
-    border-radius: 12px;
-    background: transparent;
-    color: var(--hu-text-secondary);
-    font-size: .9rem;
-    font-weight: 500;
-    text-decoration: none;
+    display: flex !important;
+    flex: 1 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 44px !important;
+    border: 1.5px solid var(--hu-border) !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: var(--hu-text-secondary) !important;
+    font-size: .9rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
     transition: border-color var(--transition),
-                color var(--transition);
+                color var(--transition) !important;
 }
 
 .filtros-btn-limpiar:hover {
-    border-color: var(--hu-danger);
-    color: var(--hu-danger);
+    border-color: var(--hu-danger) !important;
+    color: var(--hu-danger) !important;
 }
 
 /* Botón aplicar */
 .filtros-btn-aplicar {
-    flex: 1;
-    height: 44px;
-    border: 1.5px solid var(--hu-border);
-    border-radius: 12px;
+    flex: 1 !important;
+    height: 44px !important;
+    border: 1.5px solid var(--hu-border) !important;
+    border-radius: 12px !important;
     background: var(--hu-primary) !important;
     color: var(--hu-surface) !important;
-    font-size: .9rem;
-    font-weight: 500;
+    font-size: .9rem !important;
+    font-weight: 500 !important;
     transition: border-color var(--transition),
                 color var(--transition),
-                background var(--transition);
+                background var(--transition) !important;
 }
 
 .filtros-btn-aplicar:hover {
