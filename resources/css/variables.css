@@ -13,6 +13,12 @@
 
     --hu-surface: #FFFFFF;
 
+    /* Sidebar: azul institucional (hover de la marca), distinto al fondo del cuerpo */
+
+    --hu-sidebar-border: #2a6aa3;
+
+    --hu-sidebar-text: #dbe7f3;
+
     --hu-border: #DCE3EC;
 
     --hu-text: #24364B;
@@ -28,8 +34,6 @@
     --hu-danger: #DC3545;
 
     /* Layout */
-
-    --sidebar-width: 280px;
 
     --topbar-height: 105px;
 

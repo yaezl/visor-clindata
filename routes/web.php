@@ -30,10 +30,26 @@ Route::middleware('auth')->group(function () {
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // Datos de pacientes / historia clínica: SIEMPRE protegidos por auth.
     Route::resource('patients', PersonaController::class)->only(['index', 'show']);
-    // Detalle de paciente (header + tabs + accesos rápidos)
+
+    // Detalle de paciente — header liviano
     Route::get('/patients/{id}/detail', [PersonaController::class, 'detail'])
         ->whereNumber('id')
         ->name('patients.detail');
+
+    // Paneles lazy — cada acordeón fetchea su HTML por separado
+    Route::get('/patients/{id}/panel/resumen', [PersonaController::class, 'panelResumen'])
+        ->whereNumber('id')
+        ->name('patients.panel.resumen');
+    Route::get('/patients/{id}/panel/antecedentes', [PersonaController::class, 'panelAntecedentes'])
+        ->whereNumber('id')
+        ->name('patients.panel.antecedentes');
+    Route::get('/patients/{id}/panel/vacunacion', [PersonaController::class, 'panelVacunacion'])
+        ->whereNumber('id')
+        ->name('patients.panel.vacunacion');
+    Route::get('/patients/{id}/panel/crecimiento', [PersonaController::class, 'panelCrecimiento'])
+        ->whereNumber('id')
+        ->name('patients.panel.crecimiento');
+
     Route::resource('consultas', ConsultaController::class)->only(['index', 'show']);
     Route::resource('diagnosticos', DiagnosticoController::class)->only(['index', 'show']);
     Route::resource('eventos', EventohcController::class)->only(['index', 'show']);
