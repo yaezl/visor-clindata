@@ -28,9 +28,9 @@ $diagnosticoPrincipal = $diagnosticos->first()?->diagnostico?->nombre
 
 @endphp
 
-<div class="accordion history-card historial-item"
-    data-tipo="{{ strtolower($tipo) }}"
-    data-fecha="{{ optional($evento->fechahora)->format('d/m/Y') }}"
+<div class="historial-item history-select-row"
+    data-id="{{ $evento->id }}"
+    data-fecha="{{ optional($evento->fechahora)->format('Y-m-d') }}"
     data-texto="
         {{ strtolower($diagnosticos->pluck('diagnostico.nombre')->implode(' ')) }}
         {{ strtolower($detalle?->sintomas_signos ?? '') }}
@@ -38,8 +38,13 @@ $diagnosticoPrincipal = $diagnosticos->first()?->diagnostico?->nombre
         {{ strtolower($detalle?->cremiento_desarrollo ?? '') }}
         {{ strtolower(trim(($medico->nombres ?? '').' '.($medico->apellidos ?? ''))) }}
         {{ optional($evento->fechahora)->format('d/m/Y') }}
-    "
-    id="accordion-{{ $evento->id }}">
+    ">
+
+    <label class="history-select-check" title="Seleccionar para exportar">
+        <input type="checkbox" class="form-check-input historial-check" value="{{ $evento->id }}">
+    </label>
+
+<div class="accordion history-card" id="accordion-{{ $evento->id }}">
 
     <div class="accordion-item">
 
@@ -169,5 +174,7 @@ $diagnosticoPrincipal = $diagnosticos->first()?->diagnostico?->nombre
         </div>
 
     </div>
+
+</div>
 
 </div>

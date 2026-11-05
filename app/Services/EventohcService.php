@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Eventohc;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 
 class EventohcService
@@ -38,8 +39,12 @@ class EventohcService
      * Historial clínico completo de una persona para la línea de tiempo
      * del detalle de paciente (consultas, diagnósticos e informes de
      * estudio ya resueltos, ordenado del más reciente al más antiguo).
+     *
+     * Devuelve TODOS los eventos: la vista los pagina del lado del cliente
+     * ("Ver más") para que buscador, fechas y selección para imprimir
+     * funcionen sobre el historial completo.
      */
-    public function historial(int $personaId, int $porPagina = 15): LengthAwarePaginator
+    public function historial(int $personaId): Collection
     {
         return Eventohc::query()
             ->where('persona_id', $personaId)
@@ -53,7 +58,6 @@ class EventohcService
                 'informedeestudios.usuario.personal.persona',
             ])
             ->orderByDesc('fechahora')
-            ->paginate($porPagina)
-            ->withQueryString();
+            ->get();
     }
 }
