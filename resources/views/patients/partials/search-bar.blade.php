@@ -1,12 +1,5 @@
 <div class="search-form">
 
-    <select id="tipoFiltro" class="form-select" style="max-width:180px;">
-        <option value="">Todos</option>
-        <option value="consulta">Consultas</option>
-        <option value="internacion">Internaciones</option>
-        <option value="estudio">Estudios</option>
-    </select>
-
     <div class="search-input-wrapper">
 
         <span class="material-symbols-outlined search-icon">
@@ -17,20 +10,58 @@
             type="text"
             id="buscarHistorial"
             class="form-control search-input"
-            placeholder="Buscar por diagnóstico, médico, síntomas o fecha...">
+            placeholder="Buscar por diagnóstico, médico o síntomas...">
 
     </div>
 
-    <a href="{{ route('patients.export-pdf', $persona->id) }}"
-        class="btn-detail-history"
-        title="Exportar historial médico a PDF">
+    <div class="date-filter">
+        <label for="fechaDesde">Desde</label>
+        <input type="date" id="fechaDesde" class="form-control">
+    </div>
 
-        <span class="material-symbols-outlined">
-            picture_as_pdf
-        </span>
+    <div class="date-filter">
+        <label for="fechaHasta">Hasta</label>
+        <input type="date" id="fechaHasta" class="form-control">
+    </div>
 
-        Exportar PDF
+    <button type="button" id="limpiarFiltros" class="btn-clear-filters">
+        <span class="material-symbols-outlined">filter_alt_off</span>
+        <span>Limpiar filtros</span>
+    </button>
 
-    </a>
+    {{-- POST: los ids seleccionados se cargan por JS en #idsExportar --}}
+    <form id="exportForm"
+        method="POST"
+        action="{{ route('patients.export-pdf', $persona->id) }}"
+        class="m-0">
+
+        @csrf
+
+        <input type="hidden" name="ids" id="idsExportar" value="">
+
+        <button type="submit"
+            class="btn-detail-history"
+            title="Sin selección se exporta todo el historial">
+
+            <span class="material-symbols-outlined">
+                picture_as_pdf
+            </span>
+
+            <span id="btnExportarTexto">Exportar todo</span>
+
+        </button>
+
+    </form>
+
+</div>
+
+<div class="history-toolbar">
+
+    <label class="select-all">
+        <input type="checkbox" id="seleccionarTodos" class="form-check-input">
+        <span>Seleccionar todos los resultados</span>
+    </label>
+
+    <span id="resumenResultados" class="history-toolbar-info"></span>
 
 </div>

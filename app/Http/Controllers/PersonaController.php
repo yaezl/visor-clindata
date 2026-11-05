@@ -148,11 +148,24 @@ class PersonaController extends Controller
 
     /**
      * Exportar historial médico a PDF.
+     * Si llega `ids` (separados por coma) exporta solo esos eventos;
+     * sin `ids` exporta el historial completo.
      */
-    public function exportHistorialPDF(int $id)
+    public function exportHistorialPDF(Request $request, int $id)
     {
+        $request->validate([
+            'ids' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
+        ]);
+
         $persona = $this->personaService->buscar($id);
         $historial = $this->eventohcService->historial($id);
+
+        $ids = array_filter(explode(',', (string) $request->input('ids')));
+
+        if ($ids) {
+            // Se filtra sobre el historial de este paciente: un id ajeno simplemente no matchea.
+            $historial = $historial->whereIn('id', array_map('intval', $ids))->values();
+        }
  
         // Calcular iniciales
         $inicialNombre = strtoupper(substr($persona->nombres, 0, 1));

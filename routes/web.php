@@ -61,7 +61,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/urgentes', [InformedeestudioController::class, 'urgentes'])->name('urgentes');
     });
     Route::resource('informes-de-estudio', InformedeestudioController::class)->only(['index', 'show']);
-    Route::get('/{id}/export-pdf', [PersonaController::class, 'exportHistorialPDF'])->name('patients.export-pdf');
+    // POST: recibe los ids de los eventos seleccionados para imprimir.
+    Route::post('/patients/{id}/export-pdf', [PersonaController::class, 'exportHistorialPDF'])
+        ->whereNumber('id')
+        ->name('patients.export-pdf');
 
 });
 
