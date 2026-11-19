@@ -10,12 +10,17 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Carga un antecedente perinatal por cada paciente pediátrico de
- * PersonaSeeder.
+ * Carga un antecedente perinatal por cada uno de los 12 pacientes de
+ * demostración (PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO). TODOS tienen uno.
  *
- * Solo pacientes: se apoya en la misma lista de documentos de
- * personal médico que EventohcSeeder, para no crear antecedentes
- * perinatales de médicos.
+ * Criterios de coherencia usados en los datos:
+ *  - sano = true solo si no hay patología, depresión ni reanimación.
+ *  - deprimido = true solo con Apgar al minuto <= 6.
+ *  - peso / talla al nacer == primera medición de MedicionesAntropometricasSeeder.
+ *  - los diagnósticos CIE10 (categoría 'perinatal') se cargan en DiagnosticoSeeder
+ *    y se muestran en el tab Antecedentes cuando con_patologia = true.
+ *
+ * Es idempotente: si se vuelve a correr, actualiza los datos existentes.
  */
 class AntecedenteperinatalSeeder extends Seeder
 {
@@ -25,34 +30,40 @@ class AntecedenteperinatalSeeder extends Seeder
 
         $personalId = $this->personalTratanteId();
 
-        $pacientes = Persona::whereNotIn('documento', PersonalSeeder::DOCUMENTOS_PERSONAL_MEDICO)
+        $pacientes = Persona::whereIn('documento', PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO)
             ->get()
             ->keyBy('documento');
 
-        $documentosDemo = ['12345678', '87654321', '20444555', '55100006', '55100007'];
+        $datosPorDocumento = $this->antecedentesPorDocumento();
 
-        foreach ($this->antecedentesPorDocumento() as $documento => $datos) {
-            if (!in_array($documento, $documentosDemo, true)) {
-                continue;
-            }
-
+        foreach (PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO as $documento) {
             $persona = $pacientes->get($documento);
+            $datos = $datosPorDocumento[$documento] ?? null;
 
             if (!$persona) {
                 continue;
             }
 
-            $antecedente = Antecedenteperinatal::firstOrCreate(
-                ['persona_id' => $persona->id],
-                array_merge($datos['antecedente'], [
-                    'creadopor_id' => $personalId,
-                    'modificadopor_id' => $personalId,
-                    'creado_en' => now(),
-                ])
-            );
+            if (!$datos) {
+                $this->command?->warn("⚠ Sin antecedente perinatal definido para el documento {$documento}");
+                continue;
+            }
 
-            if (isset($datos['codigocie10'])) {
-                $diagnostico = Diagnostico::where('codigocie10', $datos['codigocie10'])->first();
+            $antecedente = Antecedenteperinatal::firstOrNew(['persona_id' => $persona->id]);
+
+            if (!$antecedente->exists) {
+                $antecedente->creadopor_id = $personalId;
+                $antecedente->creado_en = now();
+            }
+
+            $antecedente->fill(array_merge($datos['antecedente'], [
+                'modificadopor_id' => $personalId,
+                'modificado_en' => now(),
+            ]));
+            $antecedente->save();
+
+            foreach ((array) ($datos['codigocie10'] ?? []) as $codigo) {
+                $diagnostico = Diagnostico::where('codigocie10', $codigo)->first();
 
                 if ($diagnostico) {
                     AntecPerinatalDiagnostico::firstOrCreate([
@@ -67,12 +78,12 @@ class AntecedenteperinatalSeeder extends Seeder
     }
 
     /**
-     * @return array<string, array{antecedente: array, codigocie10?: string}>
+     * @return array<string, array{antecedente: array, codigocie10?: string|array<int, string>}>
      */
     protected function antecedentesPorDocumento(): array
     {
         return [
-            // Juan Pérez (3 años) — parto sin particularidades.
+            // Juan Pérez — parto sin particularidades.
             '12345678' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
@@ -92,27 +103,28 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // María Gómez (9 meses)
+            // María Gómez — pretérmino tardía con ictericia neonatal.
             '87654321' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
                     'tipo_parto' => 'Cesárea',
-                    'peso_al_nacer' => 2.1,
+                    'peso_al_nacer' => 2.8,
                     'edad_gestacional' => 36,
-                    'talla' => 44,
-                    'perimetro_cefalico' => 31,
-                    'sano' => true,
+                    'talla' => 47,
+                    'perimetro_cefalico' => 32.5,
+                    'sano' => false,
                     'con_patologia' => true,
                     'deprimido' => false,
                     'reanimacion' => false,
                     'apgar_1' => 8,
                     'apgar_5' => 9,
-                    'comentario' => 'Pretérmino tardía, parto indicado por hipertensión materna. Pequeña para la edad gestacional (PAEG).',
+                    'comentario' => 'Pretérmino tardía, adecuada para la edad gestacional. Cesárea indicada por hipertensión materna. Ictericia neonatal que requirió fototerapia 48 horas, con buena evolución.',
                     'pesquisa_neonatal' => 'Normal',
                 ],
+                'codigocie10' => ['P073', 'P599'],
             ],
 
-            // Carlos Gómez (2 años) — sano.
+            // Carlos Gómez — RN de término, sano.
             '67245356' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
@@ -132,7 +144,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Sofía Martínez (7 años) — sana, sin datos llamativos.
+            // Sofía Martínez — RN de término, sana.
             '41555666' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
@@ -147,12 +159,12 @@ class AntecedenteperinatalSeeder extends Seeder
                     'reanimacion' => false,
                     'apgar_1' => 9,
                     'apgar_5' => 10,
-                    'comentario' => 'Recién nacido de término, sin complicaciones periparto.',
+                    'comentario' => 'Recién nacida de término, sin complicaciones periparto.',
                     'pesquisa_neonatal' => 'Normal',
                 ],
             ],
 
-            // Ramón Díaz (11 años) — requirió reanimación breve al nacer.
+            // Ramón Díaz — requirió reanimación breve al nacer.
             '20444555' => [
                 'antecedente' => [
                     'institucion_nacio' => 'Hospital Universitario',
@@ -167,11 +179,13 @@ class AntecedenteperinatalSeeder extends Seeder
                     'reanimacion' => true,
                     'apgar_1' => 6,
                     'apgar_5' => 9,
-                    'comentario' => 'Requirió reanimación breve al nacer, con buena respuesta. Sin secuelas evidentes en los controles posteriores.',
+                    'comentario' => 'Apgar 6 al minuto: requirió reanimación breve al nacer, con buena respuesta (Apgar 9 a los 5 minutos). Sin secuelas evidentes en los controles posteriores.',
                     'pesquisa_neonatal' => 'Normal',
                 ],
+                'codigocie10' => 'P211',
             ],
-            // Valentina Torres (7 meses) — pretérmino tardía, sana.
+
+            // Valentina Torres — pretérmino tardía, sana.
             '55100001' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -191,7 +205,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Tomás Ríos (15 meses) — RN de término, sano.
+            // Tomás Ríos — RN de término, sano.
             '55100002' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -211,7 +225,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Luciana Fernández (2.5 años) — pretérmino moderada, RCIU leve.
+            // Luciana Fernández — pretérmino moderado-tardío, requirió incubadora.
             '55100003' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -226,12 +240,13 @@ class AntecedenteperinatalSeeder extends Seeder
                     'reanimacion'        => false,
                     'apgar_1'            => 7,
                     'apgar_5'            => 9,
-                    'comentario'         => 'Pretérmino moderada con RCIU leve. Requirió incubadora 10 días. Buena evolución.',
+                    'comentario'         => 'Pretérmino moderado-tardío (34 semanas), adecuada para la edad gestacional. Requirió incubadora 10 días por inmadurez y ganancia de peso. Buena evolución.',
                     'pesquisa_neonatal'  => 'Normal',
                 ],
+                'codigocie10' => 'P073',
             ],
 
-            // Agustín López (4 años) — macrosómico, cesárea programada.
+            // Agustín López — macrosómico, cesárea programada.
             '55100004' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -251,7 +266,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Camila Sánchez (5.5 años) — RN de término, parto normal.
+            // Camila Sánchez — RN de término, parto normal.
             '55100005' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -271,7 +286,7 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Mateo Herrera (8 años) — RN de término, sano.
+            // Mateo Herrera — RN de término, sano.
             '55100006' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -291,7 +306,8 @@ class AntecedenteperinatalSeeder extends Seeder
                 ],
             ],
 
-            // Isabella Morales (10 años) — pretérmino moderada, RCIU leve.
+            // Isabella Morales — pretérmino tardío con taquipnea transitoria
+            // (coherente con su historia respiratoria posterior).
             '55100007' => [
                 'antecedente' => [
                     'institucion_nacio'  => 'Hospital Universitario',
@@ -306,69 +322,10 @@ class AntecedenteperinatalSeeder extends Seeder
                     'reanimacion'        => false,
                     'apgar_1'            => 7,
                     'apgar_5'            => 9,
-                    'comentario'         => 'Pretérmino moderada. RCIU leve. Requirió incubadora 5 días.',
+                    'comentario'         => 'Pretérmino tardía, adecuada para la edad gestacional. Taquipnea transitoria: requirió incubadora 5 días. Buena evolución.',
                     'pesquisa_neonatal'  => 'Normal',
                 ],
-            ],
-
-            // Santiago Vega (12 años) — macrosómico, cesárea.
-            '55100008' => [
-                'antecedente' => [
-                    'institucion_nacio'  => 'Hospital Universitario',
-                    'tipo_parto'         => 'Cesárea',
-                    'peso_al_nacer'      => 4.1,
-                    'edad_gestacional'   => 41,
-                    'talla'              => 53,
-                    'perimetro_cefalico' => 36.0,
-                    'sano'               => true,
-                    'con_patologia'      => false,
-                    'deprimido'          => false,
-                    'reanimacion'        => false,
-                    'apgar_1'            => 9,
-                    'apgar_5'            => 10,
-                    'comentario'         => 'Cesárea por macrosomía. RN de término, sin complicaciones.',
-                    'pesquisa_neonatal'  => 'Normal',
-                ],
-            ],
-
-            // Florencia Núñez (16 años) — RN de término, sana.
-            '55100009' => [
-                'antecedente' => [
-                    'institucion_nacio'  => 'Hospital Universitario',
-                    'tipo_parto'         => 'Normal',
-                    'peso_al_nacer'      => 3.3,
-                    'edad_gestacional'   => 39,
-                    'talla'              => 50,
-                    'perimetro_cefalico' => 34.0,
-                    'sano'               => true,
-                    'con_patologia'      => false,
-                    'deprimido'          => false,
-                    'reanimacion'        => false,
-                    'apgar_1'            => 9,
-                    'apgar_5'            => 10,
-                    'comentario'         => 'RN de término, sin complicaciones periparto.',
-                    'pesquisa_neonatal'  => 'Normal',
-                ],
-            ],
-
-            // Benjamín Castro (recién nacido) — RN de término, sano.
-            '55100010' => [
-                'antecedente' => [
-                    'institucion_nacio'  => 'Hospital Universitario',
-                    'tipo_parto'         => 'Normal',
-                    'peso_al_nacer'      => 3.2,
-                    'edad_gestacional'   => 39,
-                    'talla'              => 50,
-                    'perimetro_cefalico' => 34.5,
-                    'sano'               => true,
-                    'con_patologia'      => false,
-                    'deprimido'          => false,
-                    'reanimacion'        => false,
-                    'apgar_1'            => 10,
-                    'apgar_5'            => 10,
-                    'comentario'         => 'RN de término, primera consulta de control.',
-                    'pesquisa_neonatal'  => 'Pendiente',
-                ],
+                'codigocie10' => ['P073', 'P221'],
             ],
         ];
     }

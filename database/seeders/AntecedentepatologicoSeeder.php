@@ -84,7 +84,13 @@ class AntecedentepatologicoSeeder extends Seeder
             '20444555' => [ // Ramón Díaz
                 [
                     'codigocie10' => 'H66',
-                    'comentario' => 'Antecedente de otitis media aguda a repetición durante la primera infancia, sin secuelas auditivas documentadas.',
+                    'comentario' => 'Otitis media aguda a repetición durante la primera infancia (varios episodios por año), que motivó la colocación de tubos de ventilación a los 4 años. En seguimiento por otorrinolaringología, sin secuelas auditivas documentadas.',
+                ],
+            ],
+            '41555666' => [ // Sofía Martínez (paciente crónica)
+                [
+                    'codigocie10' => 'N390',
+                    'comentario' => 'Infecciones urinarias recurrentes: 3 episodios en los últimos 2 años, con ecografía renal normal. En seguimiento, con medidas higiénico-dietéticas y urocultivo de control ante síntomas.',
                 ],
             ],
             '55100006' => [ // Mateo Herrera

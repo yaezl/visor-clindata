@@ -74,6 +74,16 @@ class AntecedentequirurgicoSeeder extends Seeder
     protected function cirugiasPorDocumento(): array
     {
         return [
+            // Ramón Díaz: cirugía asociada a su otitis media recurrente (ver
+            // AntecedentepatologicoSeeder).
+            '20444555' => [
+                [
+                    'estudio' => 'Colocación de tubos de ventilación (drenaje transtimpánico)',
+                    'edad_anios' => 4,
+                    'comentario' => 'Colocación bilateral por otitis media aguda recurrente. Sin complicaciones; extrusión espontánea de los tubos con posterioridad.',
+                ],
+            ],
+
             // Isabella Morales: antecedente quirúrgico documentado para la demo.
             '55100007' => [
                 [

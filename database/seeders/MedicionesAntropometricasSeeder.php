@@ -80,7 +80,7 @@ class MedicionesAntropometricasSeeder extends Seeder
 
         // [meses_desde_nac, peso_kg, talla_cm]
         $controles = [
-            [0,  3.3,  49.9],
+            [0,  3.2,  50.0],
             [1,  4.5,  54.7],
             [2,  5.6,  58.0],
             [3,  6.4,  61.0],
@@ -107,7 +107,7 @@ class MedicionesAntropometricasSeeder extends Seeder
         $nac = Carbon::parse($persona->fecha_nacimiento);
 
         $controles = [
-            [0, 3.2,  49.1],
+            [0, 2.8,  47.0],
             [1, 4.2,  53.7],
             [2, 5.1,  57.1],
             [3, 5.8,  59.8],
@@ -131,7 +131,7 @@ class MedicionesAntropometricasSeeder extends Seeder
         $nac = Carbon::parse($persona->fecha_nacimiento);
 
         $controles = [
-            [0,  3.5,  50.5],
+            [0,  3.4,  51.0],
             [3,  6.8,  62.0],
             [6,  8.3,  68.5],
             [9,  9.4,  73.0],
@@ -155,7 +155,7 @@ class MedicionesAntropometricasSeeder extends Seeder
 
         // [años_desde_nac, peso_kg, talla_cm]
         $controles = [
-            [0,  3.2,  49.1],
+            [0,  3.1,  49.0],
             [1,  9.0,  74.0],
             [2, 11.5,  85.5],
             [3, 13.9,  97.4],
@@ -169,7 +169,7 @@ class MedicionesAntropometricasSeeder extends Seeder
     }
 
     // ══════════════════════════════════════════════════════════════════
-    //  Ramón — ~11 años, M. Controles anuales.
+    //  Ramón — ~11 años, M. Controles anuales. Nació con 2.9 kg / 47 cm (ver perinatal).
     //  Velocidad de crecimiento baja en los últimos 2 años → alerta roja.
     // ══════════════════════════════════════════════════════════════════
     private function medicionesRamon(Persona $persona): void
@@ -177,7 +177,7 @@ class MedicionesAntropometricasSeeder extends Seeder
         $nac = Carbon::parse($persona->fecha_nacimiento);
 
         $controles = [
-            [0,  3.3,  49.9],
+            [0,  2.9,  47.0],
             [1,  9.6,  75.4],
             [2, 12.2,  86.8],
             [3, 14.3,  98.0],

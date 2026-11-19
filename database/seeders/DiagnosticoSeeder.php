@@ -62,6 +62,13 @@ class DiagnosticoSeeder extends Seeder
             // Control / salud
             ['codigocie10' => 'Z001', 'nombre' => 'Control niño sano', 'categoria' => 'control'],
             ['codigocie10' => 'Z00',  'nombre' => 'Control clínico', 'categoria' => 'control'],
+
+            // Perinatal: solo se usan en AntecedenteperinatalSeeder (no son
+            // casos de consulta, por eso no figuran en CasosClinicosPediatricos).
+            ['codigocie10' => 'P073', 'nombre' => 'Recién nacido pretérmino', 'categoria' => 'perinatal'],
+            ['codigocie10' => 'P211', 'nombre' => 'Asfixia del nacimiento leve o moderada', 'categoria' => 'perinatal'],
+            ['codigocie10' => 'P221', 'nombre' => 'Taquipnea transitoria del recién nacido', 'categoria' => 'perinatal'],
+            ['codigocie10' => 'P599', 'nombre' => 'Ictericia neonatal', 'categoria' => 'perinatal'],
         ];
 
         foreach ($diagnosticos as $diag) {
