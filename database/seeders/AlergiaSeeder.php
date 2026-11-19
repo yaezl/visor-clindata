@@ -20,13 +20,13 @@ class AlergiaSeeder extends Seeder
                     'nombre' => 'Penicilina',
                     'tipo' => 'Medicamentosa',
                     'severidad' => 'Severa',
-                    'observaciones' => 'Reacción anafiláctica confirmada en 2015.',
+                    'observaciones' => 'Antecedente de reacción inmediata compatible con alergia medicamentosa. Evitar penicilinas y verificar antes de indicar antibióticos.',
                 ],
                 [
                     'nombre' => 'Polvo ambiental',
                     'tipo' => 'Ambiental',
                     'severidad' => 'Leve',
-                    'observaciones' => 'Rinitis leve en exposición prolongada.',
+                    'observaciones' => 'Rinitis leve ante exposición prolongada.',
                 ],
             ],
             '87654321' => [ // María Gómez
@@ -34,76 +34,29 @@ class AlergiaSeeder extends Seeder
                     'nombre' => 'Maní',
                     'tipo' => 'Alimentaria',
                     'severidad' => 'Moderada',
-                    'observaciones' => null,
+                    'observaciones' => 'Reacción cutánea luego de la ingesta. Evitar el alimento y controlar posibles trazas.',
                 ],
             ],
-            '67245356' => [ // Carlos Gómez
+            '55100006' => [ // Mateo Herrera
                 [
-                    'nombre' => 'Penicilina',
-                    'tipo' => 'Medicamentosa',
-                    'severidad' => 'Severa',
-                    'observaciones' => null,
-                ],
-                [
-                    'nombre' => 'Polvo ambiental',
+                    'nombre' => 'Polen',
                     'tipo' => 'Ambiental',
                     'severidad' => 'Leve',
-                    'observaciones' => null,
+                    'observaciones' => 'Rinitis estacional que puede acompañarse de síntomas respiratorios.',
                 ],
             ],
-            // Luciana Fernández — alergia medicamentosa
-            '55100003' => [
+            '55100007' => [ // Isabella Morales
                 [
-                    'nombre'        => 'Ibuprofeno',
-                    'tipo'          => 'Medicamentosa',
-                    'severidad'     => 'Moderada',
-                    'observaciones' => 'Urticaria generalizada. Tolera paracetamol.',
-                ],
-            ],
-
-            // Camila Sánchez — alergia alimentaria
-            '55100005' => [
-                [
-                    'nombre'        => 'Huevo',
-                    'tipo'          => 'Alimentaria',
-                    'severidad'     => 'Leve',
-                    'observaciones' => 'Urticaria localizada. Tolera bien en preparaciones horneadas.',
-                ],
-            ],
-
-            // Isabella Morales — múltiples alergias
-            '55100007' => [
-                [
-                    'nombre'        => 'Amoxicilina',
-                    'tipo'          => 'Medicamentosa',
-                    'severidad'     => 'Severa',
-                    'observaciones' => 'Rash generalizado con angioedema. Evitar todos los betalactámicos.',
+                    'nombre' => 'Amoxicilina',
+                    'tipo' => 'Medicamentosa',
+                    'severidad' => 'Severa',
+                    'observaciones' => 'Antecedente de rash generalizado con angioedema. Registrar y verificar antes de indicar betalactámicos.',
                 ],
                 [
-                    'nombre'        => 'Látex',
-                    'tipo'          => 'Ambiental',
-                    'severidad'     => 'Moderada',
-                    'observaciones' => 'Detectada en internación. Usar guantes sin látex.',
-                ],
-            ],
-
-            // Santiago Vega — alergia ambiental
-            '55100008' => [
-                [
-                    'nombre'        => 'Polen',
-                    'tipo'          => 'Ambiental',
-                    'severidad'     => 'Leve',
-                    'observaciones' => 'Rinitis estacional. Empeora en primavera.',
-                ],
-            ],
-
-            // Florencia Núñez — alergia medicamentosa
-            '55100009' => [
-                [
-                    'nombre'        => 'Metamizol',
-                    'tipo'          => 'Medicamentosa',
-                    'severidad'     => 'Moderada',
-                    'observaciones' => 'Hipotensión tras administración IV. Evitar.',
+                    'nombre' => 'Látex',
+                    'tipo' => 'Ambiental',
+                    'severidad' => 'Moderada',
+                    'observaciones' => 'Utilizar insumos y guantes libres de látex durante la atención.',
                 ],
             ],
         ];

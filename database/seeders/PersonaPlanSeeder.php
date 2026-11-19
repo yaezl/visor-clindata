@@ -11,17 +11,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Asigna una obra social (vía plan) a cada paciente de prueba.
- * El flag es_cronico ya viene seteado desde PersonaSeeder.
- *
- * Distribución:
- *   OSDE           → Juan Pérez, Sofía Martínez, Valentina Torres, Mateo Herrera
- *   PAMI           → Ramón Díaz, Florencia Núñez, Benjamín Castro
- *   IOMA           → María Gómez, Agustín López, Isabella Morales
- *   Swiss Medical  → Carlos Gómez, Tomás Ríos, Santiago Vega
- *   Particular     → Luciana Fernández, Camila Sánchez
- *
- * Depende de: PersonaSeeder, ObraSocialSeeder.
+ * Asigna cobertura a los 12 pacientes ficticios de demostración.
+ * Todos son menores de edad: se registran como beneficiarios familiares
+ * con parentesco Hijo/a. PAMI permanece en el catálogo, pero no se asigna
+ * a estos pacientes pediátricos.
  */
 class PersonaPlanSeeder extends Seeder
 {
@@ -29,65 +22,64 @@ class PersonaPlanSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
-        // ── FKs obligatorias de persona_plan ─────────────────────────────
-        $titular           = TipoBeneficiario::where('nombre', 'Titular')->firstOrFail();
-        $parentescoTitular = TipoParentesco::where('nombre', 'Titular')->firstOrFail();
+        $familiar = TipoBeneficiario::where('nombre', 'Familiar')->firstOrFail();
+        $hijo = TipoParentesco::where('nombre', 'Hijo/a')->firstOrFail();
 
-        // ── Planes por defecto de cada obra social ────────────────────────
-        $planOsde       = ObraSocial::where('nombre', 'OSDE')->firstOrFail()
-                              ->plans()->where('es_por_defecto', true)->firstOrFail();
-        $planPami       = ObraSocial::where('nombre', 'PAMI')->firstOrFail()
-                              ->plans()->where('es_por_defecto', true)->firstOrFail();
-        $planIoma       = ObraSocial::where('nombre', 'IOMA')->firstOrFail()
-                              ->plans()->where('es_por_defecto', true)->firstOrFail();
-        $planSwiss      = ObraSocial::where('nombre', 'Swiss Medical')->firstOrFail()
-                              ->plans()->where('es_por_defecto', true)->firstOrFail();
-        $planParticular = ObraSocial::where('nombre', 'Particular')->firstOrFail()
-                              ->plans()->where('es_por_defecto', true)->firstOrFail();
-
-        // ── Mapa: documento → plan ────────────────────────────────────────
-        $asignaciones = [
-            '12345678' => $planOsde,        // Juan Pérez
-            '41555666' => $planOsde,        // Sofía Martínez
-            '55100001' => $planOsde,        // Valentina Torres
-            '55100006' => $planOsde,        // Mateo Herrera
-
-            '20444555' => $planPami,        // Ramón Díaz
-            '55100009' => $planPami,        // Florencia Núñez
-            '55100010' => $planPami,        // Benjamín Castro
-
-            '87654321' => $planIoma,        // María Gómez
-            '55100004' => $planIoma,        // Agustín López
-            '55100007' => $planIoma,        // Isabella Morales
-
-            '67245356' => $planSwiss,       // Carlos Gómez
-            '55100002' => $planSwiss,       // Tomás Ríos
-            '55100008' => $planSwiss,       // Santiago Vega
-
-            '55100003' => $planParticular,  // Luciana Fernández
-            '55100005' => $planParticular,  // Camila Sánchez
+        $planes = [
+            'OSDE' => ObraSocial::where('nombre', 'OSDE')->firstOrFail()
+                ->plans()->where('es_por_defecto', true)->firstOrFail(),
+            'Swiss Medical' => ObraSocial::where('nombre', 'Swiss Medical')->firstOrFail()
+                ->plans()->where('es_por_defecto', true)->firstOrFail(),
+            'IOMA' => ObraSocial::where('nombre', 'IOMA')->firstOrFail()
+                ->plans()->where('es_por_defecto', true)->firstOrFail(),
+            'Particular' => ObraSocial::where('nombre', 'Particular')->firstOrFail()
+                ->plans()->where('es_por_defecto', true)->firstOrFail(),
         ];
 
-        foreach ($asignaciones as $documento => $plan) {
-            $persona = Persona::where('documento', $documento)->first();
+        // Documento => obra social. Distribución de demostración.
+        $asignaciones = [
+            '12345678' => 'OSDE',           // Juan Pérez
+            '87654321' => 'Swiss Medical',   // María Gómez
+            '67245356' => 'IOMA',            // Carlos Gómez
+            '41555666' => 'OSDE',            // Sofía Martínez
+            '20444555' => 'Swiss Medical',   // Ramón Díaz
+            '55100001' => 'OSDE',            // Valentina Torres
+            '55100002' => 'IOMA',            // Tomás Ríos
+            '55100003' => 'Particular',      // Luciana Fernández
+            '55100004' => 'IOMA',            // Agustín López
+            '55100005' => 'Particular',      // Camila Sánchez
+            '55100006' => 'OSDE',            // Mateo Herrera
+            '55100007' => 'Swiss Medical',   // Isabella Morales
+        ];
 
+        $personas = Persona::whereIn('documento', array_keys($asignaciones))->get()->keyBy('documento');
+
+        // Desactivar asignaciones previas de estos pacientes (incluida PAMI)
+        // antes de crear la cobertura de demostración actual.
+        PersonaPlan::withTrashed()
+            ->whereIn('persona_id', $personas->pluck('id'))
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => 1,
+                'borrado_logico' => true,
+            ]);
+
+        foreach ($asignaciones as $documento => $obraSocial) {
+            $persona = $personas->get($documento);
             if (!$persona) {
-                continue; // paciente no existe en este entorno, saltar
+                continue;
             }
 
-            PersonaPlan::firstOrCreate(
-                [
-                    'persona_id' => $persona->id,
-                    'plan_id'    => $plan->id,
-                ],
-                [
-                    'tipo_beneficiario_id' => $titular->id,
-                    'tipo_parentesco_id'   => $parentescoTitular->id,
-                    'borrado_logico'       => false,
-                    'created_by'           => 1,
-                    'modified_by'          => 1,
-                ]
-            );
+            PersonaPlan::create([
+                'persona_id' => $persona->id,
+                'plan_id' => $planes[$obraSocial]->id,
+                'tipo_beneficiario_id' => $familiar->id,
+                'tipo_parentesco_id' => $hijo->id,
+                'nro_beneficiario' => 'DEMO-' . $documento,
+                'borrado_logico' => false,
+                'created_by' => 1,
+                'modified_by' => 1,
+            ]);
         }
 
         Schema::enableForeignKeyConstraints();

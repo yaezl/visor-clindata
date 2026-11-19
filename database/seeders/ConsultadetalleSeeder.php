@@ -6,6 +6,7 @@ use App\Models\Consultadetalle;
 use App\Models\Consultum;
 use App\Models\Diagnostico;
 use App\Models\DiagnosticoDetalle;
+use App\Models\Persona;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
@@ -39,9 +40,14 @@ class ConsultadetalleSeeder extends Seeder
         // de la historia de un mismo paciente, no se repita el mismo
         // caso clinico dos veces seguidas (mas realista).
         $consultasConDetalle = Consultadetalle::pluck('consulta_id')->all();
+        $personaIds = Persona::whereIn(
+            'documento',
+            PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO
+        )->pluck('id');
 
         $consultasPorPaciente = Consultum::with('eventohc')
             ->whereNotIn('id', $consultasConDetalle)
+            ->whereHas('eventohc', fn ($query) => $query->whereIn('persona_id', $personaIds))
             ->get()
             ->filter(fn($consulta) => $consulta->eventohc !== null)
             ->sortBy(fn($consulta) => $consulta->eventohc->fechahora)

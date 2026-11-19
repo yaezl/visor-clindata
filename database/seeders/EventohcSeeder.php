@@ -29,9 +29,6 @@ class EventohcSeeder extends Seeder
         '55100005' => 6,   // Camila, 5.5 años
         '55100006' => 8,   // Mateo, 8 años
         '55100007' => 10,  // Isabella, 10 años
-        '55100008' => 11,  // Santiago, 12 años
-        '55100009' => 12,  // Florencia, 16 años
-        '55100010' => 1,   // Benjamín, recién nacido
     ];
 
     protected const CANTIDAD_POR_DEFECTO = 4;
@@ -42,9 +39,8 @@ class EventohcSeeder extends Seeder
 
         $tipoConsulta = Tipocontenido::where('nombre', 'Consulta')->firstOrFail();
 
-        // Solo los pacientes (documentos que NO son de personal medico)
-        // reciben eventos de historia clinica.
-        $pacientes = Persona::whereNotIn('documento', PersonalSeeder::DOCUMENTOS_PERSONAL_MEDICO)->get();
+        // Solo los 12 pacientes definidos para la demostración reciben eventos.
+        $pacientes = Persona::whereIn('documento', PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO)->get();
 
         foreach ($pacientes as $persona) {
 
@@ -86,24 +82,22 @@ class EventohcSeeder extends Seeder
      */
     protected function generarFechas(Persona $persona, int $cantidad): \Illuminate\Support\Collection
     {
-        $nacimiento = $persona->fecha_nacimiento?->copy() ?? now()->subYears(5);
+        $nacimiento = $persona->fecha_nacimiento?->copy()->startOfDay()
+            ?? now()->subYears(5)->startOfDay();
+        $hoy = now()->copy()->startOfDay();
+        $diasDisponibles = max(1, $nacimiento->diffInDays($hoy));
 
+        // Distribución determinística de controles a lo largo de la vida
+        // del paciente. Evita que los lactantes queden con muy pocas consultas
+        // por acumular saltos aleatorios que superen su edad.
         $fechas = collect();
-        $cursor = now()->copy();
-
-        for ($i = 0; $i < $cantidad; $i++) {
-            // Espaciado irregular entre 10 y 45 dias hacia atras, sin
-            // pasar nunca la fecha de nacimiento.
-            $salto = rand(10, 45);
-            $cursor = $cursor->copy()->subDays($salto);
-
-            if ($cursor->lessThan($nacimiento)) {
-                break;
-            }
-
-            $fechas->push($cursor->copy());
+        for ($i = 1; $i <= $cantidad; $i++) {
+            $offset = (int) floor(($diasDisponibles * $i) / ($cantidad + 1));
+            $fechas->push($nacimiento->copy()->addDays($offset)->setTime(9, 0));
         }
 
-        return $fechas->sortBy(fn ($f) => $f->timestamp)->values();
+        return $fechas->unique(fn ($fecha) => $fecha->toDateTimeString())
+            ->sortBy(fn ($fecha) => $fecha->timestamp)
+            ->values();
     }
 }

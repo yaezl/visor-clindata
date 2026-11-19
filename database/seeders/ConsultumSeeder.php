@@ -29,9 +29,18 @@ class ConsultumSeeder extends Seeder
 
         $indiceMedico = 0;
 
-        // Solo procesamos eventos que todavía no tienen consulta asociada
+        // Solo procesamos los eventos de los 12 pacientes de demostración.
+        $personaIds = Persona::whereIn('documento', PersonaSeeder::DOCUMENTOS_PACIENTES_DEMO)
+            ->pluck('id');
+
         $eventosIds = Consultum::pluck('evento_id')->filter()->all();
-        foreach (Eventohc::whereNotIn('id', $eventosIds)->orderBy('persona_id')->orderBy('fechahora')->get() as $evento) {
+        foreach (
+            Eventohc::whereIn('persona_id', $personaIds)
+                ->whereNotIn('id', $eventosIds)
+                ->orderBy('persona_id')
+                ->orderBy('fechahora')
+                ->get() as $evento
+        ) {
             $medico = $medicos[$indiceMedico % $medicos->count()];
             $indiceMedico++;
 

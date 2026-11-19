@@ -49,9 +49,6 @@ class MedicionesAntropometricasSeeder extends Seeder
         $camila    = Persona::where('documento', '55100005')->first();
         $mateo     = Persona::where('documento', '55100006')->first();
         $isabella  = Persona::where('documento', '55100007')->first();
-        $santiago  = Persona::where('documento', '55100008')->first();
-        $florencia = Persona::where('documento', '55100009')->first();
-        $benjamin  = Persona::where('documento', '55100010')->first();
 
         if ($valentina) $this->medicionesValentina($valentina);
         if ($tomas)     $this->medicionesTomas($tomas);
@@ -60,9 +57,6 @@ class MedicionesAntropometricasSeeder extends Seeder
         if ($camila)    $this->medicionesCamila($camila);
         if ($mateo)     $this->medicionesMateo($mateo);
         if ($isabella)  $this->medicionesIsabella($isabella);
-        if ($santiago)  $this->medicionesSantiago($santiago);
-        if ($florencia) $this->medicionesFlorencia($florencia);
-        if ($benjamin)  $this->medicionesBenjamin($benjamin);
         if ($juan)   $this->medicionesJuan($juan);
         if ($maria)  $this->medicionesMaria($maria);
         if ($carlos) $this->medicionesCarlos($carlos);
@@ -70,7 +64,7 @@ class MedicionesAntropometricasSeeder extends Seeder
         if ($ramon)  $this->medicionesRamon($ramon);
 
         $this->command->info('✓ Mediciones antropométricas cargadas para:');
-        foreach (compact('juan', 'maria', 'carlos', 'sofia', 'ramon', 'valentina', 'tomas', 'luciana', 'agustin', 'camila', 'mateo', 'isabella', 'santiago', 'florencia', 'benjamin') as $nombre => $persona) {
+        foreach (compact('juan', 'maria', 'carlos', 'sofia', 'ramon', 'valentina', 'tomas', 'luciana', 'agustin', 'camila', 'mateo', 'isabella') as $nombre => $persona) {
             $estado = $persona ? "id {$persona->id}" : '⚠ no encontrado (correr PersonaSeeder primero)';
             $this->command->info("  · {$nombre}: {$estado}");
         }

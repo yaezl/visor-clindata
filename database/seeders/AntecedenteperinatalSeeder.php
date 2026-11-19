@@ -29,7 +29,13 @@ class AntecedenteperinatalSeeder extends Seeder
             ->get()
             ->keyBy('documento');
 
+        $documentosDemo = ['12345678', '87654321', '20444555', '55100006', '55100007'];
+
         foreach ($this->antecedentesPorDocumento() as $documento => $datos) {
+            if (!in_array($documento, $documentosDemo, true)) {
+                continue;
+            }
+
             $persona = $pacientes->get($documento);
 
             if (!$persona) {

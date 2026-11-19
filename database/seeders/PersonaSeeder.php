@@ -5,10 +5,28 @@ namespace Database\Seeders;
 use App\Models\Persona;
 use App\Models\GrupoSanguineo;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class PersonaSeeder extends Seeder
 {
+    /**
+     * Los únicos 12 pacientes ficticios del entorno de demostración.
+     * Los turnos y las historias clínicas usan esta misma lista.
+     */
+    public const DOCUMENTOS_PACIENTES_DEMO = [
+        '12345678', '87654321', '67245356', '41555666',
+        '20444555', '55100001', '55100002', '55100003',
+        '55100004', '55100005', '55100006', '55100007',
+    ];
+
+    /** Pacientes de prueba retirados del escenario de demostración. */
+    public const DOCUMENTOS_PACIENTES_EXCLUIDOS = [
+        '55100008', // Santiago Vega
+        '55100009', // Florencia Núñez
+        '55100010', // Benjamín Castro
+    ];
+
     /**
      * Documentos de las personas que son PERSONAL MÉDICO (no pacientes).
      * PersonalSeeder y ConsultumSeeder usan esta misma lista para no
@@ -38,11 +56,10 @@ class PersonaSeeder extends Seeder
         );
 
         // ── Pacientes de prueba ───────────────────────────────────────────
-        // es_cronico distribuido a propósito (5 crónicos / 10 no crónicos)
+        // es_cronico distribuido a propósito entre los 12 pacientes de demostración
         // para que el filtro tenga resultados reales en ambas opciones.
         //
-        // Crónicos: Sofía Martínez, Ramón Díaz, Isabella Morales,
-        //           Florencia Núñez, Santiago Vega.
+        // Crónicos: Sofía Martínez, Ramón Díaz, Mateo Herrera e Isabella Morales.
         $pacientes = [
             [
                 'nombres'           => 'Juan',
@@ -155,7 +172,7 @@ class PersonaSeeder extends Seeder
                 'genero'            => 'M',
                 'fecha_nacimiento'  => '2018-06-10',
                 'grupo_sanguineo_id' => $gruposPorCodigo->get('O+')?->id ?? $grupoAPositivo->id,
-                'es_cronico'        => 0,
+                'es_cronico'        => 1, // asma/hiperreactividad bronquial
             ],
             [
                 'nombres'           => 'Isabella',
@@ -166,36 +183,6 @@ class PersonaSeeder extends Seeder
                 'fecha_nacimiento'  => '2016-03-22',
                 'grupo_sanguineo_id' => $gruposPorCodigo->get('B+')?->id ?? $grupoAPositivo->id,
                 'es_cronico'        => 1, // ← crónica
-            ],
-            [
-                'nombres'           => 'Santiago',
-                'apellidos'         => 'Vega',
-                'documento'         => '55100008',
-                'sexo'              => 'M',
-                'genero'            => 'M',
-                'fecha_nacimiento'  => '2013-11-05',
-                'grupo_sanguineo_id' => $gruposPorCodigo->get('A+')?->id ?? $grupoAPositivo->id,
-                'es_cronico'        => 1, // ← crónico
-            ],
-            [
-                'nombres'           => 'Florencia',
-                'apellidos'         => 'Núñez',
-                'documento'         => '55100009',
-                'sexo'              => 'F',
-                'genero'            => 'F',
-                'fecha_nacimiento'  => '2010-08-30',
-                'grupo_sanguineo_id' => $gruposPorCodigo->get('O+')?->id ?? $grupoAPositivo->id,
-                'es_cronico'        => 1, // ← crónica
-            ],
-            [
-                'nombres'           => 'Benjamín',
-                'apellidos'         => 'Castro',
-                'documento'         => '55100010',
-                'sexo'              => 'M',
-                'genero'            => 'M',
-                'fecha_nacimiento'  => '2026-10-01',
-                'grupo_sanguineo_id' => $gruposPorCodigo->get('AB-')?->id ?? $grupoAPositivo->id,
-                'es_cronico'        => 0,
             ],
         ];
 
@@ -281,6 +268,19 @@ class PersonaSeeder extends Seeder
                 array_merge($datosObligatorios, $persona)
             );
         }
+
+        // Retirar del escenario a los tres pacientes que ya no forman parte
+        // de la demo. Se conservan sus datos relacionados en la BD; solo se
+        // aplica soft delete para no perder información histórica.
+        DB::table('persona')
+            ->whereIn('documento', self::DOCUMENTOS_PACIENTES_EXCLUIDOS)
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => 1,
+                'borrado_logico' => 1,
+                'updated_at' => now(),
+            ]);
 
         Schema::enableForeignKeyConstraints();
     }
