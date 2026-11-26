@@ -105,3 +105,59 @@
     color: #9AA4B2;
     font-size: .9rem;
 }
+
+/* Demo: credenciales de acceso */
+
+.demo-credentials {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--hu-background);
+    border-radius: 14px;
+    border: 1px solid var(--hu-border);
+}
+
+.demo-credentials__title {
+    font-size: .78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--hu-text-secondary);
+    margin-bottom: .6rem;
+}
+
+.demo-credentials__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .5rem;
+}
+
+.demo-credentials__chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: .55rem .75rem;
+    background: var(--hu-surface);
+    border: 1px solid var(--hu-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    text-align: left;
+    width: 100%;
+}
+
+.demo-credentials__chip:hover {
+    border-color: var(--hu-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+.demo-credentials__name {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--hu-text);
+}
+
+.demo-credentials__user {
+    font-size: .78rem;
+    color: var(--hu-text-secondary);
+    font-family: monospace;
+}
